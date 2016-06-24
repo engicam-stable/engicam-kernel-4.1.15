@@ -71,13 +71,19 @@ static void mmd_write_reg(struct phy_device *dev, int device, int reg, int val)
 
 static int ksz9031rn_phy_fixup(struct phy_device *dev)
 {
-	/*
-	 * min rx data delay, max rx/tx clock delay,
-	 * min rx/tx control delay
-	 */
-	mmd_write_reg(dev, 2, 4, 0);
-	mmd_write_reg(dev, 2, 5, 0);
-	mmd_write_reg(dev, 2, 8, 0x003ff);
+	printk("Init ksz9031rn PHY\n");
+
+	//write register 6 addr 2 TXD[0:3] skew
+	mmd_write_reg(dev, 2, 6, 0x4111);
+
+	//write register 5 addr 2 RXD[0:3] skew
+	mmd_write_reg(dev, 2, 5, 0x47a7);
+
+	//write register 4 addr 2 RX_DV TX_EN skew
+	mmd_write_reg(dev, 2, 4, 0x004A);
+
+	//write register 8 addr 2 RX_CLK GTX_CLK skew
+	mmd_write_reg(dev, 2, 8, 0x0273);
 
 	return 0;
 }
@@ -491,6 +497,42 @@ put_node:
 
 }
 
+static void __init icore_rqs_late_init(void)
+{
+	struct device_node *np;
+	struct platform_device *pdev;
+	struct clk *lvds2_sel, *osc, *lvds2_out;
+
+	printk("uQseven i.Core-rqs module\n");
+
+	printk("Init clock for USB HUB on RQS....");
+	lvds2_sel = clk_get_sys(NULL, "lvds2_sel");
+	osc = clk_get_sys(NULL, "osc");
+	lvds2_out = clk_get_sys(NULL, "lvds2_out");
+	if (IS_ERR(osc) || IS_ERR(lvds2_sel) ||
+	    IS_ERR(lvds2_out))
+	{
+		printk("*** Error getting clock\n");
+		return;
+	}
+	clk_set_parent(lvds2_sel, osc);
+	clk_set_rate(lvds2_out, 24000000);
+	clk_prepare_enable(lvds2_out);
+	printk("Done\n");
+
+	np = of_find_node_by_path("/soc/aips-bus@02100000/usb@02184000");
+//	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-usb");
+	pdev = of_find_device_by_node(np);
+	if (!pdev) {
+		pr_err("%s: can't find usb otg device\n", __func__);
+		goto put_node;
+	}
+
+put_node:
+	of_node_put(np);
+
+}
+
 static void __init imx6q_init_late(void)
 {
 	/*
@@ -510,6 +552,11 @@ static void __init imx6q_init_late(void)
 	if (of_machine_is_compatible("fsl,imx6-icore")) {
 				icore_late_init();
 		}
+
+	if (of_machine_is_compatible("fsl,imx6-icore-rqs")) {
+		icore_rqs_late_init();
+	}
+
 }
 
 static void __init imx6q_map_io(void)

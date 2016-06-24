@@ -12,7 +12,7 @@
 #include "imx6qdl-icore.dtsi"
 
 / {
-	model = "Engicam i.CoreM6 DualLite/Solo SOM";
+	model = "Engicam i.CoreM6 Quad/Dual SOM";
 	compatible = "fsl,imx6-icore", "fsl,imx6q";
 };
 
@@ -28,6 +28,26 @@
 &mxcfb2 {
 	status = "okay";
 };
+
+/* To be enabled for PCI peripheral.
+   Please enable also the PCI support kernel options:
+   CONFIG_PCI and PCI_IMX6
+&pcie {
+	status = "okay";
+};
+*/
+
+&sata {
+	status = "okay";
+};
+
+/* To be enabled for PCI peripheral.
+   Please enable also the PCI support kernel options:
+   CONFIG_PCI and PCI_IMX6
+&pcie {
+	status = "okay";
+};
+*/
 
 &i2c1 {
 

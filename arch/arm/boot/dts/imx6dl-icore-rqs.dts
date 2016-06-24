@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "imx6dl.dtsi"
+#include "imx6qdl-icore-rqs.dtsi"
+
+/ {
+	model = "Engicam i.CoreM6 DualLite/Solo SOM";
+	compatible = "fsl,imx6-icore-rqs", "fsl,imx6dl";
+};
+
+&ldb {
+	ipu_id = <0>;
+	sec_ipu_id = <0>;
+};
+
+&mxcfb1 {
+	status = "okay";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+&i2c1 {
+
+	lm75a@4F {
+		compatible = "lm75a";
+		reg = <0x4F>;
+	};
+
+};
+
+&i2c2 {
+
+	hdmi: edid@50 {
+		compatible = "fsl,imx6-hdmi-i2c";
+		reg = <0x50>;
+	};
+
+};
+
+
+&i2c3 {
+
+	codec: sgtl5000@0a {
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks 201>;
+		VDDA-supply = <&reg_2p5v>;
+		VDDIO-supply = <&reg_3p3v>;
+		VDDD-supply = <&reg_1p8v>;
+	};
+
+};
+
+&iomuxc {
+
+// TBD	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+	
+	hog {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
+				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
+			>;
+		};
+	};
+};
+
+

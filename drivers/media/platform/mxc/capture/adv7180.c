@@ -33,18 +33,6 @@
 #include "v4l2-int-device.h"
 #include "mxc_v4l2_capture.h"
 
-#undef dev_dbg
-#define dev_dbg(dev, format, arg...)		\
-	printk(format, ##arg)
-
-#undef dev_warn
-#define dev_warn(dev, format, arg...)		\
-	printk(format, ##arg)
-
-#undef dev_err
-#define dev_err(dev, format, arg...)		\
-	printk(format, ##arg)
-
 #define ADV7180_VOLTAGE_ANALOG               1800000
 #define ADV7180_VOLTAGE_DIGITAL_CORE         1800000
 #define ADV7180_VOLTAGE_DIGITAL_IO           3300000

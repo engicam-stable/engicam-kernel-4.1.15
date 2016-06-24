@@ -12,7 +12,7 @@
 #include "imx6qdl-icore.dtsi"
 
 / {
-	model = "Engicam i.CoreM6 DualLite/Solo SOM";
+	model = "Engicam i.CoreM6 DualLite/Solo starterkit";
 	compatible = "fsl,imx6-icore", "fsl,imx6dl";
 };
 
@@ -168,7 +168,7 @@
 		pinctrl_edt_ft5x06:  edt-ft5x06grp  {
 			fsl,pins = <
 				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
-				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset*/
+				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset edt*/
 			>;
 		};
 	};

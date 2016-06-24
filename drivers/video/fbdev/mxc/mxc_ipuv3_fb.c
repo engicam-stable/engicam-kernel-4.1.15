@@ -51,6 +51,7 @@
 #include <linux/string.h>
 #include <linux/time.h>
 #include <linux/uaccess.h>
+#include <linux/of_gpio.h>
 
 #include "mxc_dispdrv.h"
 
@@ -211,6 +212,73 @@ enum {
 	TGT_ON,
 	BOTH_OFF
 };
+
+/* LVDS enabled control */
+static void mxcfb_lvds_power (bool bStatus)
+{
+	static bool bGpioInizialized=false;
+	static bool bGpioValid=false;
+	static int gpio_pointer = 0;
+	static u32 lvds_delay=20;
+
+	// Inizializing the GPIO from device tree
+	if(!bGpioInizialized)
+	{
+		struct device_node *np = NULL;
+		struct platform_device *pdev = NULL;
+		u32 lvds_delay_array[2];
+		bGpioInizialized=true;
+
+		/* Load the resource from device tree */
+		np = of_find_node_by_path("/soc/aips-bus@02000000/iomuxc@020e0000");
+		pdev = of_find_device_by_node(np);
+
+		if (!pdev) 
+		{
+			printk("Can't find lvds-reset dts node\n");
+			return;
+		}
+
+		gpio_pointer = of_get_named_gpio(np, "lvdsreset-pin", 0);
+
+		/* Get delay value */
+		if (of_property_read_u32_array(np, "lvdsreset-delay", lvds_delay_array, 1) == 0)
+		{
+			lvds_delay=lvds_delay_array[0];
+		}
+
+		/* Set the GPIO */
+		if(gpio_is_valid(gpio_pointer) && !gpio_request_one(gpio_pointer, GPIOF_DIR_OUT, "lvdsreset-pin") )
+		{
+			bGpioValid=true;
+		}
+
+	}
+
+	// Move the GPIO
+	if(bGpioInizialized && bGpioValid)
+	{
+		static bool bFirstTime=true;
+		static bool bPreviusStatus=false;
+
+		// If there is no change with the previus status the fuction end
+		if(bPreviusStatus==bStatus && bFirstTime==false)
+	 		return;
+		bFirstTime=false;
+		bPreviusStatus=bStatus;
+
+		gpio_direction_output(gpio_pointer, 0);
+		if(bStatus)
+		{
+			mdelay(lvds_delay);
+			gpio_direction_output(gpio_pointer, 1);
+		}
+		else
+		{
+			gpio_direction_output(gpio_pointer, 0);
+		}
+	}
+}
 
 static bool g_dp_in_use[2];
 LIST_HEAD(fb_alloc_list);
@@ -2322,10 +2390,16 @@ static int mxcfb_blank(int blank, struct fb_info *info)
 	mxc_fbi->next_blank = blank;
 
 	if (blank == FB_BLANK_UNBLANK) {
+		if(info->node==0)
+			mxcfb_lvds_power(true);
+
 		info->var.activate = (info->var.activate & ~FB_ACTIVATE_MASK) |
 				FB_ACTIVATE_NOW | FB_ACTIVATE_FORCE;
 		ret = fb_set_var(info, &info->var);
 	} else {
+		if(info->node==0)
+			mxcfb_lvds_power(false);
+
 		if (mxc_fbi->dispdrv && mxc_fbi->dispdrv->drv->disable)
 			mxc_fbi->dispdrv->drv->disable(mxc_fbi->dispdrv, info);
 		ipu_disable_channel(mxc_fbi->ipu, mxc_fbi->ipu_ch, true);
@@ -3434,6 +3508,8 @@ static int mxcfb_get_of_property(struct platform_device *pdev,
 	return err;
 }
 
+extern void pwm_backlight_enable (bool bStatus);
+
 /*!
  * Probe routine for the framebuffer driver. It is called during the
  * driver binding process.      The following functions are performed in
@@ -3456,6 +3532,12 @@ static int mxcfb_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "can not get alias id\n");
 		return pdev->id;
 	}
+	
+	if(pdev->id==0)
+	{
+		pwm_backlight_enable(false);
+		mxcfb_lvds_power(false);
+	}
 
 	plat_data = devm_kzalloc(&pdev->dev, sizeof(struct
 					ipuv3_fb_platform_data), GFP_KERNEL);
@@ -3477,6 +3559,7 @@ static int mxcfb_probe(struct platform_device *pdev)
 	}
 
 	ret = mxcfb_option_setup(pdev, fbi);
+
 	if (ret)
 		goto get_fb_option_failed;
 
@@ -3581,6 +3664,12 @@ static int mxcfb_probe(struct platform_device *pdev)
 	if (ret)
 		dev_err(&pdev->dev, "Error %d on creating file for disp "
 				    " device propety\n", ret);
+	if(pdev->id==0)
+	{
+		mxcfb_lvds_power(true);
+		mdelay(20);
+		pwm_backlight_enable(true);
+	}
 
 	return 0;
 

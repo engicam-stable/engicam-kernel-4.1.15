@@ -322,7 +322,7 @@
 &can2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2_1>;
-	status = "disabled";
+	status = "okay";
 };
 
 &ldb {
@@ -362,16 +362,22 @@
 	status = "okay";
 };
 
-&gpmi {
+&uart3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
-	status = "okay"; 
+	pinctrl-0 = <&pinctrl_uart3_2>;
+	status = "okay";
 };
 
 &uart4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4_1>;
 	status = "okay";
+};
+
+&gpmi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
+	status = "okay"; 
 };
 
 &usbh1 {
@@ -392,57 +398,16 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1_2>;
 	cd-gpios = <&gpio1 1 0>;
-//	wp-gpios = <&gpio5 20 0>;
 	no-1-8-v;
-//	keep-power-in-suspend;
-//	enable-sdio-wakeup;
 	status = "okay";
 };
 
-#ifdef TOLTO_MM
-&usdhc3 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc3_1>;
-	pinctrl-1 = <&pinctrl_usdhc3_1_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc3_1_200mhz>;
-	cd-gpios = <&gpio6 15 0>;
-	wp-gpios = <&gpio1 13 0>;
-	/*
-	 * Due to board issue, we can not use external regulator for card slot
-	 * by default since the card power is shared with card detect pullup.
-	 * Disabling the vmmc regulator will cause unexpected card detect
-	 * interrupts.
-	 * HW rework is needed to fix this isssue. Remove R695 first, then you
-	 * can open below line to enable the using of external regulator.
-	 * Then you will be able to power off the card during suspend. This is
-	 * especially needed for a SD3.0 card re-enumeration working on UHS mode
-	 * Note: reg_sd3_vmmc is also need to be enabled
-	 */
-	/* vmmc-supply = <&reg_sd3_vmmc>; */
-	keep-power-in-suspend;
-	enable-sdio-wakeup;
-	status = "okay";
-};
-
-&weim {
+&usdhc2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_weim_nor_1 &pinctrl_weim_cs0_1>;
-	#address-cells = <2>;
-	#size-cells = <1>;
-	ranges = <0 0 0x08000000 0x08000000>;
-	status = "disabled"; /* pin conflict with ecspi1, i2c3 and uart3 */
-
-	nor@0,0 {
-		compatible = "cfi-flash";
-		reg = <0 0 0x02000000>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		bank-width = <2>;
-		fsl,weim-cs-timing = <0x00620081 0x00000001 0x1c022000
-				0x0000c000 0x1404a38e 0x00000000>;
-	};
+	pinctrl-0 = <&pinctrl_usdhc2_2>;
+	no-1-8-v;
+	status = "okay";
 };
-#endif
 
 &iomuxc {
 	audmux {

@@ -33,6 +33,18 @@
 #include "v4l2-int-device.h"
 #include "mxc_v4l2_capture.h"
 
+#undef dev_dbg
+#define dev_dbg(dev, format, arg...)		\
+	printk(format, ##arg)
+
+#undef dev_warn
+#define dev_warn(dev, format, arg...)		\
+	printk(format, ##arg)
+
+#undef dev_err
+#define dev_err(dev, format, arg...)		\
+	printk(format, ##arg)
+
 #define ADV7180_VOLTAGE_ANALOG               1800000
 #define ADV7180_VOLTAGE_DIGITAL_CORE         1800000
 #define ADV7180_VOLTAGE_DIGITAL_IO           3300000
@@ -934,6 +946,15 @@ static void adv7180_hard_reset(bool cvbs)
 		adv7180_write_reg(ADV7180_INPUT_CTL, 0x09);
 	}
 
+#define ENGICAM
+#ifdef ENGICAM
+	// setup decoder to output VSYNC
+	adv7180_write_reg(0x58, 0x01);
+
+	// ITU-R BT.656
+	adv7180_write_reg(0x04, 0x45);
+	adv7180_write_reg(0xF4, 0x3F);
+#else
 	/* Datasheet recommends */
 	adv7180_write_reg(0x01, 0xc8);
 	adv7180_write_reg(0x02, 0x04);
@@ -1173,6 +1194,7 @@ static void adv7180_hard_reset(bool cvbs)
 	adv7180_write_reg(0xF9, 0x03);
 	adv7180_write_reg(0xFA, 0xFA);
 	adv7180_write_reg(0xFB, 0x40);
+#endif
 }
 
 /*! ADV7180 I2C attach function.

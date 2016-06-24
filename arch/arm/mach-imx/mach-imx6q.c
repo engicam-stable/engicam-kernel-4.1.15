@@ -237,21 +237,42 @@ put_node:
 
 static void __init imx6q_csi_mux_init(void)
 {
-	/*
-	 * MX6Q SabreSD board:
-	 * IPU1 CSI0 connects to parallel interface.
-	 * Set GPR1 bit 19 to 0x1.
-	 *
-	 * MX6DL SabreSD board:
-	 * IPU1 CSI0 connects to parallel interface.
-	 * Set GPR13 bit 0-2 to 0x4.
-	 * IPU1 CSI1 connects to MIPI CSI2 virtual channel 1.
-	 * Set GPR13 bit 3-5 to 0x1.
-	 */
 	struct regmap *gpr;
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+
 	if (!IS_ERR(gpr)) {
+		/*
+		 * MX6Q i.Core board:
+		 * IPU1 CSI0 connects to parallel interface.
+		 * IPU2 CSI1 connects to parallel interface.
+		 * Set GPR1 bit 19 and 20 to 0x1.
+		 *
+		 * MX6DL SabreSD board:
+		 * IPU1 CSI0 connects to parallel interface.
+		 * Set GPR13 bit 0-2 to 0x4.
+		 * IPU1 CSI1 connects to parallel interface.
+		 * Set GPR13 bit 3-5 to 0x4.
+		 */
+		if (of_machine_is_compatible("fsl,imx6-icore"))
+		{
+			if(cpu_is_imx6q())
+				regmap_update_bits(gpr, IOMUXC_GPR1, 3 << 19, 3 << 19);
+			else
+				regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x24);
+		}
+
+		/*
+		 * MX6Q SabreSD board:
+		 * IPU1 CSI0 connects to parallel interface.
+		 * Set GPR1 bit 19 to 0x1.
+		 *
+		 * MX6DL SabreSD board:
+		 * IPU1 CSI0 connects to parallel interface.
+		 * Set GPR13 bit 0-2 to 0x4.
+		 * IPU1 CSI1 connects to MIPI CSI2 virtual channel 1.
+		 * Set GPR13 bit 3-5 to 0x1.
+		 */
 		if (of_machine_is_compatible("fsl,imx6q-sabresd") ||
 			of_machine_is_compatible("fsl,imx6q-sabreauto"))
 			regmap_update_bits(gpr, IOMUXC_GPR1, 1 << 19, 1 << 19);

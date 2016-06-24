@@ -190,6 +190,13 @@ unsigned long iomux_offsets_mx6q[][2] = {
 	{0x5C0, 0x0},
 };
 
+unsigned long ddr3_calibration_icore[][2] = {
+	{0x83c, 0x0},
+	{0x840, 0x0},
+	{0x848, 0x0},
+	{0x850, 0x0},
+};
+
 unsigned long ddr3_dll_mx6dl[][2] = {
 	{0x0c, 0x0},
 	{0x10, 0x0},
@@ -633,23 +640,23 @@ int init_mmdc_ddr3_settings_imx6_smp(struct platform_device *busfreq_pdev)
 
 	if (cpu_is_imx6q())
 		ddr_settings_size = ARRAY_SIZE(ddr3_dll_mx6q) +
-			ARRAY_SIZE(ddr3_calibration);
+			ARRAY_SIZE(ddr3_calibration_icore);
 	if (cpu_is_imx6dl())
 		ddr_settings_size = ARRAY_SIZE(ddr3_dll_mx6dl) +
-			ARRAY_SIZE(ddr3_calibration);
+			ARRAY_SIZE(ddr3_calibration_icore);
 
 	normal_mmdc_settings = kmalloc((ddr_settings_size * 8), GFP_KERNEL);
 	if (cpu_is_imx6q()) {
 		memcpy(normal_mmdc_settings, ddr3_dll_mx6q,
 			sizeof(ddr3_dll_mx6q));
 		memcpy(((char *)normal_mmdc_settings + sizeof(ddr3_dll_mx6q)),
-			ddr3_calibration, sizeof(ddr3_calibration));
+			ddr3_calibration_icore, sizeof(ddr3_calibration_icore));
 	}
 	if (cpu_is_imx6dl()) {
 		memcpy(normal_mmdc_settings, ddr3_dll_mx6dl,
 			sizeof(ddr3_dll_mx6dl));
 		memcpy(((char *)normal_mmdc_settings + sizeof(ddr3_dll_mx6dl)),
-			ddr3_calibration, sizeof(ddr3_calibration));
+			ddr3_calibration_icore, sizeof(ddr3_calibration_icore));
 	}
 	/* store the original DDR settings at boot. */
 	for (i = 0; i < ddr_settings_size; i++) {

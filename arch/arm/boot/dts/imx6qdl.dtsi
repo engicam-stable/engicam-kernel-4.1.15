@@ -363,7 +363,7 @@
 					       <&sdma 38 22 0>;
 					dma-names = "rx", "tx";
 					fsl,fifo-depth = <15>;
-					status = "disabled";
+					status = "okay";
 				};
 
 				ssi2: ssi@0202c000 {

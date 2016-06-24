@@ -34,7 +34,7 @@
 		codec_osc: anaclk2 {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <24576000>;
+			clock-frequency = <24000000>;
 		};
 	};
 
@@ -132,6 +132,14 @@
 			regulator-always-on;
 		};
 
+		reg_1p8v: 1p8v {
+			compatible = "regulator-fixed";
+			regulator-name = "1P8V";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+		};
+
 		reg_sd3_vmmc: sd3_vmmc{
 			compatible = "regulator-fixed";
 			regulator-name = "P3V3_SDa_SWITCHED";
@@ -153,7 +161,7 @@
 			"MIC_IN", "Mic Jack",
 			"Mic Jack", "Mic Bias",
 			"Headphone Jack", "HP_OUT";
-		mux-int-port = <2>;
+		mux-int-port = <1>;
 		mux-ext-port = <4>;
 	};
 
@@ -290,7 +298,7 @@
 };
 
 &ssi1 {
-	fsl,mode = "i2s-master";
+	fsl,mode = "i2s-slave";
 	status = "okay";
 };
 

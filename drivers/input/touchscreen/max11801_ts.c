@@ -43,6 +43,8 @@
 #include <linux/of.h>
 #include <linux/of_device.h>
 
+#define ICORE6M_DRIVER_TS
+
 /* Register Address define */
 #define GENERNAL_STATUS_REG		0x00
 #define GENERNAL_CONF_REG		0x01
@@ -175,6 +177,8 @@ static int max11801_write_reg(struct i2c_client *client, int addr, int data)
 	return i2c_smbus_write_byte_data(client, addr << 1, data);
 }
 
+static int px, py;
+
 static irqreturn_t max11801_ts_interrupt(int irq, void *dev_id)
 {
 	struct max11801_data *data = dev_id;
@@ -251,11 +255,15 @@ static irqreturn_t max11801_ts_interrupt(int irq, void *dev_id)
 			input_report_abs(data->input_dev, ABS_X, x);
 			y = MAX11801_MAX_Y - y;	/* Calibration */
 			input_report_abs(data->input_dev, ABS_Y, y);
-			input_event(data->input_dev, EV_KEY, BTN_TOUCH, 1);
+			input_report_abs(data->input_dev, ABS_PRESSURE, 1);
 			input_sync(data->input_dev);
+			px=x;
+			py=y;
 			break;
 		case EVENT_RELEASE:
-			input_event(data->input_dev, EV_KEY, BTN_TOUCH, 0);
+			input_report_abs(data->input_dev, ABS_X, px);
+			input_report_abs(data->input_dev, ABS_Y, py);
+			input_report_abs(data->input_dev, ABS_PRESSURE, 0);
 			input_sync(data->input_dev);
 			break;
 		case EVENT_FIFO_END:
@@ -274,9 +282,9 @@ static void max11801_ts_phy_init(struct max11801_data *data)
 	/* Average X,Y, take 16 samples average eight media sample */
 	max11801_write_reg(client, MESURE_AVER_CONF_REG, 0xff);
 	/* X,Y panel setup time set to 20us */
-	max11801_write_reg(client, PANEL_SETUPTIME_CONF_REG, 0x11);
+	max11801_write_reg(client, PANEL_SETUPTIME_CONF_REG, 0x88);
 	/* Rough pullup time (2uS), Fine pullup time (10us) */
-	max11801_write_reg(client, TOUCH_DETECT_PULLUP_CONF_REG, 0x10);
+	max11801_write_reg(client, TOUCH_DETECT_PULLUP_CONF_REG, 0x75);
 	/* Auto mode init period = 5ms, scan period = 5ms */
 	max11801_write_reg(client, AUTO_MODE_TIME_CONF_REG, 0xaa);
 	/* Aperture X,Y set to +- 4LSB */
@@ -328,8 +336,12 @@ static int max11801_ts_probe(struct i2c_client *client,
 	__set_bit(EV_ABS, input_dev->evbit);
 	__set_bit(EV_KEY, input_dev->evbit);
 	__set_bit(BTN_TOUCH, input_dev->keybit);
+	__set_bit(ABS_X, input_dev->absbit);
+	__set_bit(ABS_Y, input_dev->absbit);
+	__set_bit(ABS_PRESSURE, input_dev->absbit);
 	input_set_abs_params(input_dev, ABS_X, 0, MAX11801_MAX_X, 0, 0);
 	input_set_abs_params(input_dev, ABS_Y, 0, MAX11801_MAX_Y, 0, 0);
+	input_set_abs_params(input_dev, ABS_PRESSURE, 0, 1, 0, 0);
 	input_set_drvdata(input_dev, data);
 
 	if (of_property_read_u32(of_node, "work-mode", &max11801_workmode))

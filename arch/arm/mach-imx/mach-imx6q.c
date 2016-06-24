@@ -32,6 +32,7 @@
 #include <linux/mfd/syscon.h>
 #include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
 #include <linux/of_net.h>
+#include <linux/of_gpio.h>
 #include <asm/mach/arch.h>
 #include <asm/mach/map.h>
 #include <asm/system_misc.h>
@@ -429,6 +430,46 @@ static struct platform_device imx6q_cpufreq_pdev = {
 	.name = "imx6q-cpufreq",
 };
 
+static void __init icore_late_init(void)
+{
+	struct device_node *np;
+	struct platform_device *pdev;
+	struct pinctrl *pctl;
+	int icore_ver_gpio;
+
+	np = of_find_node_by_path("/soc/aips-bus@02100000/usb@02184000");
+//	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-usb");
+	pdev = of_find_device_by_node(np);
+	if (!pdev) {
+		pr_err("%s: can't find usb otg device\n", __func__);
+		goto put_node;
+	}
+
+
+	icore_ver_gpio = of_get_named_gpio(np, "ver-gpios", 0);
+
+	if (gpio_is_valid(icore_ver_gpio) &&
+		!gpio_request_one(icore_ver_gpio, GPIOF_DIR_IN, "icore_ver_gpio")) {
+		if(gpio_get_value(icore_ver_gpio))
+		{
+			printk("i.Core revision C or older\n");
+			pctl = pinctrl_get_select(&pdev->dev, "rev_c"); 
+			if (IS_ERR(pctl)) {
+				pr_err("%s: can't get pinctrl state\n", __func__);
+				goto put_node;
+			}
+		}		
+		else
+			printk("i.Core revision D or higher\n");
+	}
+	else
+		goto put_node;	
+
+put_node:
+	of_node_put(np);
+
+}
+
 static void __init imx6q_init_late(void)
 {
 	/*
@@ -444,6 +485,10 @@ static void __init imx6q_init_late(void)
 		imx6q_opp_init();
 		platform_device_register(&imx6q_cpufreq_pdev);
 	}
+
+	if (of_machine_is_compatible("fsl,imx6-icore")) {
+				icore_late_init();
+		}
 }
 
 static void __init imx6q_map_io(void)

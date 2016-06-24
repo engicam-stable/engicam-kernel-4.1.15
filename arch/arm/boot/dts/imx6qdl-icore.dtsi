@@ -284,7 +284,6 @@
 	};
 };
 
-#ifdef TOLTO_MM
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog>;
@@ -292,27 +291,12 @@
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_NANDF_CS2__GPIO6_IO15 0x1f059
-				MX6QDL_PAD_SD2_DAT2__GPIO1_IO13  0x80000000
-				MX6QDL_PAD_EIM_A24__GPIO5_IO04   0x80000000
-				MX6QDL_PAD_SD2_DAT0__GPIO1_IO15  0x80000000
-				MX6QDL_PAD_EIM_EB0__GPIO2_IO28   0x80000000
-				MX6QDL_PAD_EIM_EB1__GPIO2_IO29	0x80000000
-				MX6QDL_PAD_DISP0_DAT23__GPIO5_IO17 0x80000000
-				MX6QDL_PAD_SD2_CMD__GPIO1_IO11 0x80000000
-				MX6QDL_PAD_SD2_DAT3__GPIO1_IO12 0x80000000
-				MX6QDL_PAD_SD4_DAT4__GPIO2_IO12 0x80000000
-				MX6QDL_PAD_SD4_DAT7__GPIO2_IO15 0x80000000
-				MX6QDL_PAD_DISP0_DAT20__GPIO5_IO14 0x80000000
-				MX6QDL_PAD_GPIO_18__SD3_VSELECT	0x17059
-				MX6QDL_PAD_CSI0_DATA_EN__GPIO5_IO20 0x17059
-				MX6QDL_PAD_GPIO_1__GPIO1_IO01 0x17059
-				MX6QDL_PAD_SD3_RST__GPIO7_IO08 0x80000000
+				MX6QDL_PAD_SD3_CMD__GPIO7_IO02 0x1f059
 			>;
 		};
 	};
 };
-#endif
+
 &can1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1_1>;
@@ -388,9 +372,11 @@
 
 &usbotg {
 	vbus-supply = <&reg_usb_otg_vbus>;
-	pinctrl-names = "default";
+	pinctrl-names = "default", "rev_c";
 	pinctrl-0 = <&pinctrl_usbotg_2>;
+	pinctrl-1 = <&pinctrl_usbotg_3>;
 	disable-over-current;
+	ver-gpios = <&gpio7 2 0>;
 	status = "okay";
 };
 

@@ -43,12 +43,112 @@ static struct fb_videomode lcdif_modedb[] = {
 	FB_VMODE_NONINTERLACED,
 	0,},
 	{
+	/* 480x272 @ 60 Hz  OPENFRAME 4.3'' */
+	"URT-8484MD" , 60, 480, 272, 100000,  8, 2, 11, 2 ,   35 , 2 ,
+ 	FB_SYNC_CLK_LAT_FALL,
+	FB_VMODE_NONINTERLACED,
+	0,}, 	{
+	 /* URT 640x480 @ 60 Hz OPENFRAME 5.7'' */
+	 "URT-VGA" , 60, 640, 480, 38000, 80, 80, 22, 22, 30, 3,
+	 FB_SYNC_CLK_LAT_FALL,
+	 FB_VMODE_NONINTERLACED,
+	 0,}, 
+	{
+	 /* URT 800x480 @ 60 Hz OPENFRAME 7'' */
+	 "URT-LVDS" , 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
+	 /*FB_SYNC_CLK_IDLE_EN |*/ FB_SYNC_CLK_LAT_FALL,
+	 FB_VMODE_NONINTERLACED,
+	 0,},   
+	 {   
+	 /* 800x480 @ 60 Hz OPENFRAME 10.4'' */ 
+	 "HIT-LVDS" , 60, 800, 600, 30000, 30, 30, 5, 5, 64, 20,
+	 /*FB_SYNC_CLK_IDLE_EN |*/ FB_SYNC_CLK_LAT_FALL,
+	 FB_VMODE_NONINTERLACED,
+	 0,},
+	{
+	 /* 1280x800 @ 60 Hz OPENFRAME CAP 10.1'' */ 
+	 "LCD-WXGAI", 60, 1280, 800, 14065,
+	 40, 40,
+	 10, 3,
+	 80, 10,
+	 FB_SYNC_CLK_LAT_FALL,
+	 FB_VMODE_NONINTERLACED,
+	 FB_MODE_IS_DETAILED,
+	},   
+	{
+	/* 1024x600 @ 60 Hz OPENFRAME RES 10.1'' */ 
+	"LCD-WSGA", 60, 1024, 600, 18939, 353, 47, 39, 4, 8, 2,
+	FB_SYNC_CLK_LAT_FALL | FB_SYNC_COMP_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+	FB_VMODE_NONINTERLACED
+	 },
+	{
+	/* 1280x480 @ 60 Hz */
+	"LDB-HSXGA", 60, 1280, 480, 18939, 353, 47, 39, 4, 8, 2,
+	FB_SYNC_CLK_LAT_FALL | FB_SYNC_COMP_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+	FB_VMODE_NONINTERLACED
+	 },                                     
+	{
 	/* 800x480 @ 60 Hz , pixel clk @ 32MHz */
 	"SEIKO-WVGA", 60, 800, 480, 29850, 89, 164, 23, 10, 10, 10,
 	FB_SYNC_CLK_LAT_FALL,
 	FB_VMODE_NONINTERLACED,
 	0,},
+	{
+	 /* 800x480 @ 60 Hz STARTERKIT 7'' */ 
+	 "Amp-WD" , 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
+	 FB_SYNC_CLK_LAT_FALL,
+	 FB_VMODE_NONINTERLACED,
+	 0,},
+	{
+	 /* 800x480 @ 60 Hz , pixel clk @ 32MHz */
+	 "URT-WVGA", 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
+	 FB_SYNC_CLK_IDLE_EN,
+	 FB_VMODE_NONINTERLACED,
+	 0,},
+	 {
+         /* 1280x480 @ 60 Hz */
+	"LDB-HSXGA", 60, 1280, 480, 18939, 353, 47, 39, 4, 8, 2,
+	FB_SYNC_CLK_LAT_FALL | FB_SYNC_COMP_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+	FB_VMODE_NONINTERLACED
+         },
+	 {
+     	/* GO70Y2-L01 800x480 @ 60 Hz 7'' */
+     	"GO70Y2-L01" , 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
+     	FB_SYNC_CLK_LAT_FALL,
+     	FB_VMODE_NONINTERLACED,
+     	0,},
+	{
+	/* 1024x768  */
+        "LVDS-G150" , 65, 1024, 768, 15384,
+	40, 40,
+	5, 5,
+	136, 6,
+	FB_SYNC_CLK_LAT_FALL,
+        FB_VMODE_NONINTERLACED,
+	FB_MODE_IS_DETAILED,
+        },
+	{
+	/* 1024x768  */
+        "LVDS-G121" , 65, 1024, 768, 15384,
+	40, 40,
+	5, 5,
+	136, 6,
+	0,
+        FB_VMODE_NONINTERLACED,
+	FB_MODE_IS_DETAILED,
+        },
+	{
+	/* 1024x768  */
+        "LVDS-G121" , 65, 1024, 768, 15384,
+	40, 40,
+	5, 5,
+	136, 6,
+	0,
+        FB_VMODE_NONINTERLACED,
+	FB_MODE_IS_DETAILED,
+        },
 };
+
 static int lcdif_modedb_sz = ARRAY_SIZE(lcdif_modedb);
 
 static int lcdif_init(struct mxc_dispdrv_handle *disp,

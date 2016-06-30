@@ -21,6 +21,7 @@
 #include <linux/of_gpio.h>
 #include <linux/pinctrl/pinctrl.h>
 #include <linux/slab.h>
+#include <linux/delay.h>
 
 #include "core.h"
 #include "devicetree.h"
@@ -197,6 +198,8 @@ static int dt_gpio_assert_pinctrl(struct pinctrl *p)
 					    NULL);
 		if (ret < 0)
 			return ret;
+
+		udelay(1000);
 
 		if (flags & OF_GPIO_ACTIVE_LOW)
 			continue;

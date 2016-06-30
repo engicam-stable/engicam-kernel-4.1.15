@@ -72,6 +72,12 @@ config USB_SERIAL_SIMPLE
 	  To compile this driver as a module, choose M here: the module
 	  will be called usb-serial-simple.
 
+config USB_GOBISERIAL
+	tristate "SIMCOM Modem USB Serial driver"
+	default y
+	help
+	  usb serial driver for SIMCOM modem
+
 config USB_SERIAL_AIRCABLE
 	tristate "USB AIRcable Bluetooth Dongle Driver"
 	help

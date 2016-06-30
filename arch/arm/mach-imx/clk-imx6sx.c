@@ -107,7 +107,8 @@ static int const clks_init_on[] __initconst = {
 	IMX6SX_CLK_IPMUX1, IMX6SX_CLK_IPMUX2, IMX6SX_CLK_IPMUX3,
 	IMX6SX_CLK_WAKEUP, IMX6SX_CLK_MMDC_P0_FAST, IMX6SX_CLK_MMDC_P0_IPG,
 	IMX6SX_CLK_ROM, IMX6SX_CLK_ARM, IMX6SX_CLK_IPG, IMX6SX_CLK_OCRAM,
-	IMX6SX_CLK_PER2_MAIN, IMX6SX_CLK_PERCLK,
+	IMX6SX_CLK_PER2_MAIN, IMX6SX_CLK_PERCLK, IMX6SX_CLK_ENET_REF, IMX6SX_CLK_ENET2_REF,
+	IMX6SX_CLK_ENET2_REF_125M, IMX6SX_CLK_ENET_PTP_REF, IMX6SX_CLK_ENET_PTP, IMX6SX_CLK_AUDIO
 };
 
 static struct clk_div_table clk_enet_ref_table[] = {
@@ -609,8 +610,16 @@ static void __init imx6sx_clocks_init(struct device_node *ccm_node)
 	imx_clk_set_parent(clks[IMX6SX_CLK_ENET_PRE_SEL], clks[IMX6SX_CLK_PLL2_PFD2]);
 	imx_clk_set_parent(clks[IMX6SX_CLK_ENET_SEL], clks[IMX6SX_CLK_ENET_PODF]);
 	imx_clk_set_rate(clks[IMX6SX_CLK_ENET_PODF], 200000000);
-	imx_clk_set_rate(clks[IMX6SX_CLK_ENET_REF], 125000000);
-	imx_clk_set_rate(clks[IMX6SX_CLK_ENET2_REF], 125000000);
+        if (of_machine_is_compatible("fsl,imx6sx-smarcore"))
+	{  		
+		clk_set_rate(clks[IMX6SX_CLK_ENET_REF], 125000000);
+		clk_set_rate(clks[IMX6SX_CLK_ENET2_REF], 125000000);
+	}
+	else
+	{
+		clk_set_rate(clks[IMX6SX_CLK_ENET_REF], 25000000);
+		clk_set_rate(clks[IMX6SX_CLK_ENET2_REF], 25000000);
+	}
 
 	/* Audio clocks */
 	imx_clk_set_rate(clks[IMX6SX_CLK_PLL4_AUDIO_DIV], 393216000);

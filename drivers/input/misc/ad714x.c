@@ -6,12 +6,15 @@
  * Licensed under the GPL-2 or later.
  */
 
+#define DEBUG
 #include <linux/device.h>
 #include <linux/input.h>
 #include <linux/interrupt.h>
 #include <linux/slab.h>
 #include <linux/input/ad714x.h>
 #include <linux/module.h>
+#include <linux/of.h>
+#include <linux/of_device.h>
 #include "ad714x.h"
 
 #define AD714X_PWR_CTRL           0x0
@@ -960,6 +963,131 @@ static irqreturn_t ad714x_interrupt_thread(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
+
+#ifdef CONFIG_OF
+
+struct ad714x_button_plat button_plat[4];
+#define CDC_OFST_HI     0x400
+#define CDC_OFST_LO     0x400
+#define CDC_OFST_CLAMP  0x280
+#define KEYNUM 4 //  6  messo da Claudio.. usati solo 4 tasti
+#define STAGES_USED (0xFF >> (8 - KEYNUM))
+
+static short unsigned sys_cfg_reg[8] = {0x00B2, 0x0, 0x3230, 0x0419, 0x832, STAGES_USED, STAGES_USED, 0x0};
+
+static short unsigned  StageBuffer[12][8] = {
+  //======================
+  //= Stage 0 - CIN0 (+) =
+  //======================
+	{0xFFFE, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+
+  //======================
+  //= Stage 1 - CIN1 (+) =
+  //======================
+	{0xFFFB, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+
+  //======================
+  //= Stage 2 - CIN2 (+) =
+  //======================
+	{0xFFEF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+
+  //======================
+  //= Stage 3 - CIN3 (+) =
+  //======================
+	{0xFFBF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+
+  //===========================
+  //= Stage 4 - Not connected =
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+    
+  //===========================
+  //= Stage 5 - Not connected =
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+  
+  //===========================
+  //= Stage 6 - Not connected =
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+    
+  //===========================
+  //= Stage 7 - Not connected =
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+    
+  //===========================
+  //= Stage 8 - Not connected
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+  
+  //===========================
+  //= Stage 9 - Not connected =
+  //===========================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+  
+  //============================
+  //= Stage 10 - Not Connected =
+  //============================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP},
+    
+  
+  //============================
+  //= Stage 11 - Not Connected =
+  //============================
+	{0xFFFF, 0x1FFF, 0x0F00, 0x2626, CDC_OFST_LO, CDC_OFST_HI, CDC_OFST_CLAMP, CDC_OFST_CLAMP}
+
+};
+
+static int ad714x_i2c_probe_dt(struct device *dev,
+				struct ad714x_platform_data *tsdata)
+{
+	struct device_node *np = dev->of_node;
+	int i, j;
+
+	of_property_read_u32(np, "button_num", &tsdata->button_num);
+	of_property_read_u32(np, "touchpad_num", &tsdata->touchpad_num);
+	of_property_read_u32(np, "wheel_num", &tsdata->wheel_num);
+	of_property_read_u32(np, "slider_num", &tsdata->slider_num);
+/* TBD da agganciare tasti a DT */
+	tsdata->button_num = 4;
+	tsdata->button = button_plat;
+	i = 0;
+	tsdata->button[i].keycode = KEY_1;
+	tsdata->button[i].l_mask = 0;
+	tsdata->button[i].h_mask = 0x8;
+
+	i++;
+	tsdata->button[i].keycode = KEY_2;
+	tsdata->button[i].l_mask = 0;
+	tsdata->button[i].h_mask = 0x4;
+
+	i++;
+	tsdata->button[i].keycode = KEY_3;
+	tsdata->button[i].l_mask = 0;
+	tsdata->button[i].h_mask = 0x2;
+
+	i++;
+	tsdata->button[i].keycode =  KEY_4;
+	tsdata->button[i].l_mask = 0;
+	tsdata->button[i].h_mask = 0x1;
+
+	for (i = 0; i < STAGE_NUM; i++) 
+		for (j = 0; j < STAGE_CFGREG_NUM; j++)
+		tsdata->stage_cfg_reg[i][j] = StageBuffer[i][j];
+
+	for (i = 0; i < 8; i++) 
+ 		tsdata->sys_cfg_reg[i] = sys_cfg_reg[i];
+	return 0;
+}
+#else
+static inline int ad714x_i2c_probe_dt(struct device *dev,
+					struct ad714x_platform_data *tsdata)
+{
+	return -ENODEV;
+}
+#endif
+
 #define MAX_DEVICE_NUM 8
 struct ad714x_chip *ad714x_probe(struct device *dev, u16 bus_type, int irq,
 				 ad714x_read_t read, ad714x_write_t write)
@@ -1003,6 +1131,7 @@ struct ad714x_chip *ad714x_probe(struct device *dev, u16 bus_type, int irq,
 
 	ad714x->hw = plat_data;
 
+
 	drv_mem = ad714x + 1;
 	ad714x->sw = drv_mem;
 	drv_mem += sizeof(*ad714x->sw);
@@ -1025,8 +1154,8 @@ struct ad714x_chip *ad714x_probe(struct device *dev, u16 bus_type, int irq,
 		goto err_free_mem;
 
 	/* initialize and request sw/hw resources */
-
 	ad714x_hw_init(ad714x);
+
 	mutex_init(&ad714x->mutex);
 
 	/*
@@ -1133,6 +1262,7 @@ struct ad714x_chip *ad714x_probe(struct device *dev, u16 bus_type, int irq,
 		}
 	}
 
+
 	/* all buttons use one input node */
 	if (ad714x->hw->button_num > 0) {
 		struct ad714x_button_plat *bt_plat = ad714x->hw->button;
@@ -1162,8 +1292,8 @@ struct ad714x_chip *ad714x_probe(struct device *dev, u16 bus_type, int irq,
 		alloc_idx++;
 	}
 
-	irqflags = plat_data->irqflags ?: IRQF_TRIGGER_FALLING;
-	irqflags |= IRQF_ONESHOT;
+//	irqflags = plat_data->irqflags ?: IRQF_TRIGGER_FALLING;
+	irqflags = IRQF_ONESHOT| IRQF_TRIGGER_FALLING;
 
 	error = request_threaded_irq(ad714x->irq, NULL, ad714x_interrupt_thread,
 				     irqflags, "ad714x_captouch", ad714x);

@@ -76,11 +76,26 @@
 };
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_lvds>;
+	lvdsreset-delay = <30>;
+	lvdsreset-pin = <&gpio6 0 GPIO_ACTIVE_LOW>;
+	lvds {
+		pinctrl_lvds: lvdsgrp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1f059 // LVDS reset
+			>;
+		};
+	};
+};
 
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog1>;
 	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 	
 	hog {
-		pinctrl_hog: hoggrp {
+		pinctrl_hog1: hoggrp {
 			fsl,pins = <
 				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
@@ -90,12 +105,22 @@
 };
 
 &iomuxc {
-	touchpanel{
-		pinctrl_edt_ft5x06:  edt-ft5x06grp  {
+
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog2>;
+
+	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+	
+	hog {
+		pinctrl_hog2: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
-				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset edt*/
+				MX6QDL_PAD_CSI0_MCLK__GPIO5_IO19 0x1f059
+				MX6QDL_PAD_CSI0_PIXCLK__GPIO5_IO18 0x1f059
+				MX6QDL_PAD_CSI0_VSYNC__GPIO5_IO21 0x1f059
+				MX6QDL_PAD_CSI0_DAT19__GPIO6_IO05 0x1f059
+				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
 			>;
 		};
 	};
 };
+

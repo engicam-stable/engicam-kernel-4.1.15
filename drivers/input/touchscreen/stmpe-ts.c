@@ -117,16 +117,41 @@ static void stmpe_work(struct work_struct *work)
 
 	/* reset the FIFO before we report release event */
 	__stmpe_reset_fifo(ts->stmpe);
-
 	input_report_abs(ts->idev, ABS_PRESSURE, 0);
 	input_report_key(ts->idev, BTN_TOUCH, 0);
 	input_sync(ts->idev);
 }
 
+#if 0
+static void sort(int * number,int nitems)
+{
+    int i,j,a;
+    for (i = 0; i < nitems; ++i)
+    {
+        for (j = i + 1; j < nitems; ++j)
+        {
+            if (number[i] > number[j])
+            {
+                a =  number[i];
+                number[i] = number[j];
+                number[j] = a;
+            }
+        }
+    }
+}
+#endif
+
 static irqreturn_t stmpe_ts_handler(int irq, void *data)
 {
 	u8 data_set[4];
-	int i, x, y, z, x0, y0, z0;
+	int x, y, z;
+	#define VECTORMAX 5
+#if 0
+	int i
+	int  xv[VECTORMAX];
+	int  yv[VECTORMAX];
+	int  zv[VECTORMAX];
+#endif
 	struct stmpe_touch *ts = data;
 
 	/*
@@ -143,7 +168,7 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 	 */
 	stmpe_set_bits(ts->stmpe, STMPE_REG_TSC_CTRL,
 				STMPE_TSC_CTRL_TSC_EN, 0);
-
+#if 0
 	stmpe_block_read(ts->stmpe, STMPE_REG_TSC_DATA_XYZ, 4, data_set);
 
 	
@@ -154,6 +179,8 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 	x0 = x + 100;
 	y0 = z0 = 0;
 	i = 10;
+
+
 #define DELTA_P		10
 	while ((abs(x-x0) > DELTA_P)||(abs(y-y0) > DELTA_P))
 	{
@@ -173,12 +200,45 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 		z = data_set[3];
 		z += 1;
 	}	
+#endif
+#if 0
+	for (i=0;i<VECTORMAX;i++)
+	{	
+		udelay(100);
+		stmpe_block_read(ts->stmpe, STMPE_REG_TSC_DATA_XYZ, 4, data_set);
+		xv[i] = (data_set[0] << 4) | (data_set[1] >> 4);
+		yv[i] = ((data_set[1] & 0xf) << 8) | data_set[2];
+		zv[i] = data_set[3];
+	}
+
+	sort(xv ,VECTORMAX);
+	sort(yv ,VECTORMAX);
+	sort(zv ,VECTORMAX);
+
+	x=xv[2];
+	y=yv[2];
+	z=1;//zv[VECTORMAX -1];
+
+	input_report_abs(ts->idev, ABS_X, x);
+	input_report_abs(ts->idev, ABS_Y, y);
+	input_report_abs(ts->idev, ABS_PRESSURE, z);
+	input_report_key(ts->idev, BTN_TOUCH, 1);
+	input_sync(ts->idev);	     
+#endif
+
+#if 1
+	stmpe_block_read(ts->stmpe, STMPE_REG_TSC_DATA_XYZ, 4, data_set);
+	x = (data_set[0] << 4) | (data_set[1] >> 4);
+	y = ((data_set[1] & 0xf) << 8) | data_set[2];
+	z = data_set[3];
+
+	
 	input_report_abs(ts->idev, ABS_X, x);
 	input_report_abs(ts->idev, ABS_Y, y);
 	input_report_abs(ts->idev, ABS_PRESSURE, z);
 	input_report_key(ts->idev, BTN_TOUCH, 1);
 	input_sync(ts->idev);
-
+#endif
        /* flush the FIFO after we have read out our values. */
 	__stmpe_reset_fifo(ts->stmpe);
 

@@ -69,6 +69,21 @@
 		interrupt-parent = <&gpio5>;
 		interrupts = <30 0>;	
 		reset-gpios = <&gpio6 0 1>;
+		// Different setting for Ampire/URT
+		// invert_y = <0>; for Ampire  LCD 
+		// invert_y = <1>; for URT  LCD 
+		invert_y = <0>;
+	};
+
+
+	// New touch 4.3" AVD
+	maxtouch@4a {
+		compatible = "atmel,maxtouch";
+		reg = <0x4a>;
+		pinctrl-names = "default";		
+		pinctrl-0 = <&pinctrl_maxtouch_ts>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <30 0>;	
 	};
 
 	adv7180: adv7180@21 {
@@ -89,6 +104,7 @@
 		cvbs = <1>;
 	};
 	
+	// Optional RTC
 	pcf8563: rtc@51 {
 		compatible = "pcf8563";
 		reg = <0x51>;
@@ -111,12 +127,23 @@
 	};
 };
 
+
 &iomuxc {
 	touchpanel{
 		pinctrl_st1232_ts:  st1232-tsgrp  {
 			fsl,pins = <
 				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
 				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset edt*/
+			>;
+		};
+	};
+};
+
+&iomuxc {
+	touchpanel{
+		pinctrl_maxtouch_ts:  maxtouch-tsgrp  {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
 			>;
 		};
 	};

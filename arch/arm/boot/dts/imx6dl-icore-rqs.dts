@@ -14,6 +14,12 @@
 / {
 	model = "Engicam i.CoreM6 DualLite/Solo SOM";
 	compatible = "fsl,imx6-icore-rqs", "fsl,imx6dl";
+	
+	aliases {
+		mmc1 = &usdhc4;
+		mmc0 = &usdhc3;
+		mmc2 = &usdhc1;
+	};
 };
 
 &ldb {

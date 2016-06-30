@@ -8,6 +8,7 @@
 
 /dts-v1/;
 
+#include <dt-bindings/gpio/gpio.h>
 #include "imx6dl.dtsi"
 #include "imx6qdl-icore.dtsi"
 
@@ -105,11 +106,12 @@
 };
 
 &iomuxc {
-
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog2>;
 	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 	
 	hog {
-		pinctrl_hog: hoggrp {
+		pinctrl_hog2: hoggrp {
 			fsl,pins = <
 				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */

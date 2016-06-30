@@ -22,6 +22,7 @@
 #include <linux/gpio.h>
 #include <linux/i2c.h>
 #include <linux/input.h>
+#include <linux/input/mt.h>
 #include <linux/interrupt.h>
 #include <linux/module.h>
 #include <linux/of.h>
@@ -40,6 +41,8 @@
 #define MAX_AREA	0xff
 #define MAX_FINGERS	2
 
+#define INVERT_Y
+
 struct st1232_ts_finger {
 	u16 x;
 	u16 y;
@@ -51,9 +54,42 @@ struct st1232_ts_data {
 	struct i2c_client *client;
 	struct input_dev *input_dev;
 	struct st1232_ts_finger finger[MAX_FINGERS];
+	u16 max_x;
+	u16 max_y;	
 	struct dev_pm_qos_request low_latency_req;
 	int reset_gpio;
 };
+
+static int st1232_ts_read_resolution(struct st1232_ts_data *ts)
+{
+
+	struct i2c_client *client = ts->client;
+	struct i2c_msg msg[2];
+	int error;
+	u8 start_reg;
+	u8 buf[10];
+
+	/* read touchscreen data from ST1232 */
+	msg[0].addr = client->addr;
+	msg[0].flags = 0;
+	msg[0].len = 1;
+	msg[0].buf = &start_reg;
+	start_reg = 0x0;
+
+	msg[1].addr = ts->client->addr;
+	msg[1].flags = I2C_M_RD;
+	msg[1].len = sizeof(buf);
+	msg[1].buf = buf;
+
+	error = i2c_transfer(client->adapter, msg, 2);
+	if (error < 0)
+		return error;
+
+	ts->max_x = ((buf[4] & 0x0070) << 4) | buf[5];
+	ts->max_y = ((buf[4] & 0x0007) << 8) | buf[6];
+
+	return 0;
+}
 
 static int st1232_ts_read_data(struct st1232_ts_data *ts)
 {
@@ -88,12 +124,18 @@ static int st1232_ts_read_data(struct st1232_ts_data *ts)
 	if (finger[0].is_valid) {
 		finger[0].x = ((buf[2] & 0x0070) << 4) | buf[3];
 		finger[0].y = ((buf[2] & 0x0007) << 8) | buf[4];
+#ifdef INVERT_Y
+		finger[0].y = ts->max_y - finger[0].y;
+#endif
 		finger[0].t = buf[8];
 	}
 
 	if (finger[1].is_valid) {
 		finger[1].x = ((buf[5] & 0x0070) << 4) | buf[6];
 		finger[1].y = ((buf[5] & 0x0007) << 8) | buf[7];
+#ifdef INVERT_Y
+		finger[1].y = ts->max_y - finger[1].y;
+#endif
 		finger[1].t = buf[9];
 	}
 
@@ -114,24 +156,29 @@ static irqreturn_t st1232_ts_irq_handler(int irq, void *dev_id)
 
 	/* multi touch protocol */
 	for (i = 0; i < MAX_FINGERS; i++) {
+	        input_mt_slot(input_dev, i);
+                input_mt_report_slot_state(input_dev, MT_TOOL_FINGER, finger[i].is_valid);
+
 		if (!finger[i].is_valid)
 			continue;
 
 		input_report_abs(input_dev, ABS_MT_TOUCH_MAJOR, finger[i].t);
 		input_report_abs(input_dev, ABS_MT_POSITION_X, finger[i].x);
 		input_report_abs(input_dev, ABS_MT_POSITION_Y, finger[i].y);
-		input_mt_sync(input_dev);
+		//input_mt_sync(input_dev);
 		count++;
 	}
 
+	input_mt_report_pointer_emulation(input_dev, true);
+
 	/* SYN_MT_REPORT only if no contact */
-	if (!count) {
-		input_mt_sync(input_dev);
+	//if (!count) {
+		//input_mt_sync(input_dev);
 		if (ts->low_latency_req.dev) {
 			dev_pm_qos_remove_request(&ts->low_latency_req);
 			ts->low_latency_req.dev = NULL;
 		}
-	} else if (!ts->low_latency_req.dev) {
+		else if (!ts->low_latency_req.dev) {
 		/* First contact, request 100 us latency. */
 		dev_pm_qos_add_ancestor_request(&ts->client->dev,
 						&ts->low_latency_req,
@@ -206,10 +253,29 @@ static int st1232_ts_probe(struct i2c_client *client,
 	__set_bit(EV_SYN, input_dev->evbit);
 	__set_bit(EV_KEY, input_dev->evbit);
 	__set_bit(EV_ABS, input_dev->evbit);
+        __set_bit(BTN_TOUCH, input_dev->keybit);
 
-	input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR, 0, MAX_AREA, 0, 0);
-	input_set_abs_params(input_dev, ABS_MT_POSITION_X, MIN_X, MAX_X, 0, 0);
-	input_set_abs_params(input_dev, ABS_MT_POSITION_Y, MIN_Y, MAX_Y, 0, 0);
+	error = st1232_ts_read_resolution(ts);
+	if (error < 0)	{
+		dev_err(&client->dev, "I2C error\n");
+		return(error);
+	}
+
+	printk("st1232-ts probed: resolution %dx%d\n", ts->max_x, ts->max_y);
+        /* Single touch */
+        input_set_abs_params(input_dev, ABS_X, 0, MAX_X, 0, 0);
+        input_set_abs_params(input_dev, ABS_Y, 0, MAX_Y, 0, 0);
+
+        /* Multi touch */
+	input_mt_init_slots(input_dev, MAX_FINGERS,0);
+ 	input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR, 0, MAX_AREA, 0, 0);
+	input_set_abs_params(input_dev, ABS_MT_POSITION_X, MIN_X, ts->max_x, 0, 0);
+	input_set_abs_params(input_dev, ABS_MT_POSITION_Y, MIN_Y, ts->max_y, 0, 0);
+
+	//input_set_abs_params(input_dev, ABS_MT_TOUCH_MAJOR, 0, MAX_AREA, 0, 0);
+	//input_set_abs_params(input_dev, ABS_MT_POSITION_X, MIN_X, MAX_X, 0, 0);
+	//input_set_abs_params(input_dev, ABS_MT_POSITION_Y, MIN_Y, MAX_Y, 0, 0);	
+	input_set_drvdata(input_dev, ts);
 
 	error = devm_request_threaded_irq(&client->dev, client->irq,
 					  NULL, st1232_ts_irq_handler,

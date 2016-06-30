@@ -13,7 +13,7 @@
 #include "imx6qdl-icore.dtsi"
 
 / {
-	model = "Engicam i.CoreM6 Quad/Dual starterkit";
+	model = "Engicam i.CoreM6 Quad/Dual wi openframe";
 	compatible = "fsl,imx6-icore", "fsl,imx6q";
 };
 
@@ -42,18 +42,6 @@
 };
 */
 
-&i2c1 {
-
-	max11801@48 {
-		compatible = "maxim,max11801";
-		reg = <0x48>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <31 2>;
-		work-mode = <0>;/*DCM mode*/
-	};
-
-};
-
 &i2c2 {
 
 	hdmi: edid@50 {
@@ -73,11 +61,11 @@
 		VDDD-supply = <&reg_1p8v>;
 	};
 
-	polytouch: edt-ft5x06@38 {
-		compatible = "edt,edt-ft5406";
-		reg = <0x38>;
+	polytouch: st1232_ts@55 {
+		compatible = "sitronix,st1232-ts";
+		reg = <0x55>;
 		pinctrl-names = "default";		
-		pinctrl-0 = <&pinctrl_edt_ft5x06>;
+		pinctrl-0 = <&pinctrl_st1232_ts>;
 		interrupt-parent = <&gpio5>;
 		interrupts = <30 0>;	
 		reset-gpios = <&gpio6 0 1>;
@@ -109,11 +97,12 @@
 };
 
 &iomuxc {
-
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog2>;
 	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 	
 	hog {
-		pinctrl_hog: hoggrp {
+		pinctrl_hog2: hoggrp {
 			fsl,pins = <
 				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
@@ -124,7 +113,7 @@
 
 &iomuxc {
 	touchpanel{
-		pinctrl_edt_ft5x06:  edt-ft5x06grp  {
+		pinctrl_st1232_ts:  st1232-tsgrp  {
 			fsl,pins = <
 				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
 				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset edt*/

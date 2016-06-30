@@ -67,7 +67,6 @@
 		compatible = "fsl,imx6-hdmi-i2c";
 		reg = <0x50>;
 	};
-
 };
 
 
@@ -107,6 +106,12 @@
 		mclk_source = <0>;
 		cvbs = <1>;
 	};
+	
+	pcf8563: rtc@51 {
+		compatible = "pcf8563";
+		reg = <0x51>;
+	};
+
 };
 
 &iomuxc {

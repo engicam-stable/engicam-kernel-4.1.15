@@ -116,6 +116,7 @@ static void __init imx6sx_map_io(void)
 
 static const char * const imx6sx_dt_compat[] __initconst = {
 	"fsl,imx6sx",
+	"fsl,imx6sx-icore",
 	NULL,
 };
 

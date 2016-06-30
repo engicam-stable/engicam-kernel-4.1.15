@@ -16,12 +16,11 @@
 	model = "Engicam i.Core M6 SoloX";
 	compatible = "fsl,imx6sx-icore", "fsl,imx6sx";
 
-	backlight1 {
+	backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm5 0 50000>;
 		brightness-levels = <0 4 8 16 32 64 128 255>;
-		default-brightness-level = <7>;
-		fb-names = "mxs-lcdif0";
+		default-brightness-level = <6>;
 	};
 
 	memory {
@@ -109,6 +108,18 @@
 };
 
 &csi2 {
+	status = "okay";
+};
+
+&dcic1 {
+	dcic_id = <0>;
+	dcic_mux = "dcic-lcdif1";
+	status = "okay";
+};
+
+&dcic2 {
+	dcic_id = <1>;
+	dcic_mux = "dcic-lvds";
 	status = "okay";
 };
 

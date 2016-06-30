@@ -10,6 +10,9 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
 / {
 	aliases {
 		mxcfb0 = &mxcfb1;
@@ -324,6 +327,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
 	status = "okay"; 
+	nand-on-flash-bbt;
 };
 
 &usbh1 {
@@ -345,7 +349,7 @@
 &usdhc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1_2>;
-	cd-gpios = <&gpio1 1 0>;
+	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 	no-1-8-v;
 	status = "okay";
 };

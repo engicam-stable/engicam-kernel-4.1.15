@@ -41,14 +41,6 @@
 	status = "okay";
 };
 
-/* To be enabled for PCI peripheral.
-   Please enable also the PCI support kernel options:
-   CONFIG_PCI and PCI_IMX6
-&pcie {
-	status = "okay";
-};
-*/
-
 &i2c1 {
 
 	max11801@48 {

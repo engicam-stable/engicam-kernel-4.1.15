@@ -126,7 +126,7 @@ static void stmpe_work(struct work_struct *work)
 static irqreturn_t stmpe_ts_handler(int irq, void *data)
 {
 	u8 data_set[4];
-	int x, y, z;
+	int i, x, y, z, x0, y0, z0;
 	struct stmpe_touch *ts = data;
 
 	/*
@@ -146,10 +146,33 @@ static irqreturn_t stmpe_ts_handler(int irq, void *data)
 
 	stmpe_block_read(ts->stmpe, STMPE_REG_TSC_DATA_XYZ, 4, data_set);
 
+	
 	x = (data_set[0] << 4) | (data_set[1] >> 4);
 	y = ((data_set[1] & 0xf) << 8) | data_set[2];
 	z = data_set[3];
-
+	
+	x0 = x + 100;
+	y0 = z0 = 0;
+	i = 10;
+#define DELTA_P		10
+	while ((abs(x-x0) > DELTA_P)||(abs(y-y0) > DELTA_P))
+	{
+		if(i-- < 0)
+		{
+			z = 0;
+			printk("stmpe-ts: too much noise!!!\n");
+			break;			
+		}
+		udelay(100);
+		stmpe_block_read(ts->stmpe, STMPE_REG_TSC_DATA_XYZ, 4, data_set);
+		x0 = x;
+		y0 = y;
+		z0 = z; 
+		x = (data_set[0] << 4) | (data_set[1] >> 4);
+		y = ((data_set[1] & 0xf) << 8) | data_set[2];
+		z = data_set[3];
+		z += 1;
+	}	
 	input_report_abs(ts->idev, ABS_X, x);
 	input_report_abs(ts->idev, ABS_Y, y);
 	input_report_abs(ts->idev, ABS_PRESSURE, z);

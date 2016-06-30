@@ -1242,7 +1242,6 @@ int stmpe_probe(struct stmpe_client_info *ci, enum stmpe_partnum partnum)
 	ret = stmpe_chip_init(stmpe);
 	if (ret)
 		return ret;
-
 	if (stmpe->irq >= 0) {
 		ret = stmpe_irq_init(stmpe, np);
 		if (ret)

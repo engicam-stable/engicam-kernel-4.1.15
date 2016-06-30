@@ -269,6 +269,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-ofres.dtb \
 	imx6dl-ofcap.dtb \
 	imx6dl-ofwi.dtb \
+	imx6dl-ofloco.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
 	imx6dl-rex-basic.dtb \

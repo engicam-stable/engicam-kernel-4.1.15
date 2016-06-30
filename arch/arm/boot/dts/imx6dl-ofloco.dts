@@ -1,0 +1,118 @@
+/*
+ * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "imx6dl.dtsi"
+#include "imx6qdl-icore.dtsi"
+
+/ {
+	model = "Engicam i.CoreM6 DualLite/Solo Openframe LOCO";
+	compatible = "fsl,imx6-icore", "fsl,imx6dl";
+};
+
+&ldb {
+	ipu_id = <0>;
+	sec_ipu_id = <0>;
+};
+
+&mxcfb1 {
+	status = "okay";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+/* To be enabled for PCI peripheral.
+   Please enable also the PCI support kernel options:
+   CONFIG_PCI and PCI_IMX6
+&pcie {
+	status = "okay";
+};
+*/
+
+&i2c1 {
+
+};
+
+&i2c2 {
+
+	hdmi: edid@50 {
+		compatible = "fsl,imx6-hdmi-i2c";
+		reg = <0x50>;
+	};
+
+};
+
+
+&i2c3 {
+
+	stmpe811@44 {
+		compatible = "st,stmpe811";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x44>;
+		id = <1>; /* I2C2 (0-based define) */
+		blocks = <0x5>; /* Touchscreen */
+		irq-trigger = <0x1>; /* Rising Edge */
+		interrupts = <30 8>;
+		interrupt-parent = <&gpio5>;
+		irq-over-gpio;
+		irq-gpios = <&gpio5 30 0x4>;
+
+		stmpe_gpio_1: stmpe_gpio {
+		    compatible = "st,stmpe-gpio";
+		};
+		stmpe_touchscreen {
+		    compatible = "st,stmpe-ts";
+		    reg = <0>;
+		    ts,sample-time = <6>;
+		    ts,mod-12b = <0>;
+		    ts,ref-sel = <0>;
+		    ts,adc-freq = <1>;
+		    ts,ave-ctrl = <3>;
+		    ts,touch-det-delay = <4>;
+		    ts,settling = <6>;
+		    ts,fraction-z = <7>;
+		    ts,i-drive = <1>;
+		};
+	};
+
+	codec: sgtl5000@0a {
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks 201>;
+		VDDA-supply = <&reg_2p5v>;
+		VDDIO-supply = <&reg_3p3v>;
+		VDDD-supply = <&reg_1p8v>;
+		status = "disabled";
+	};
+
+	pcf8563: rtc@51 {
+		compatible = "pcf8563";
+		reg = <0x51>;
+	};
+};
+
+&iomuxc {
+
+	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+	
+	hog {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x80000000 /*interrupt*/ 
+				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
+				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
+			>;
+		};
+	};
+};
+
+

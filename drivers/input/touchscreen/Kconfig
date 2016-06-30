@@ -454,6 +454,19 @@ config TOUCHSCREEN_MAX11801
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called max11801_ts.
+	  
+config ENGICAM_MAX1180_CUSTOM
+	bool "MAX11801 for Engicam board"
+	default Y
+	depends on TOUCHSCREEN_MAX11801
+	help
+	  Select this option for include Engicam custom driver improvment. This
+	  option is strictly recommended for big size LCD screen and resistive
+	  openframe board.
+	  
+	  If unsure, say Y.
+	  
+	  Deselect this option for using default driver configuration.
 
 config TOUCHSCREEN_MCS5000
 	tristate "MELFAS MCS-5000 touchscreen"

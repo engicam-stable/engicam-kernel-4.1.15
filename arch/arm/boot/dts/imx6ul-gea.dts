@@ -287,12 +287,13 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	fsl,uart-has-rtscts;
+	//fsl,uart-has-rtscts;
 	/* for DTE mode, add below change */
 	/* fsl,dte-mode; */
 	/* pinctrl-0 = <&pinctrl_uart2dte>; */
 	status = "okay";
 };
+
 
 &usbotg1 {
 	dr_mode = "peripheral";

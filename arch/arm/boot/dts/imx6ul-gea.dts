@@ -13,7 +13,7 @@
 #include "imx6ul.dtsi"
 
 / {
-	model = "Freescale i.MX6 UltraLite EVK Board";
+	model = "Engicam GEA M6UL SOM Starterkit";
 	compatible = "fsl,imx6ul-evk", "fsl,imx6ul";
 
 	chosen {

@@ -367,6 +367,7 @@
 		pinctrl_hog_1: hoggrp-1 {
 			fsl,pins = <
 				MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x17059 /* WF111 reset */
+				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 			>;
 		};
 

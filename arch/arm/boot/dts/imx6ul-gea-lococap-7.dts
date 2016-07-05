@@ -322,15 +322,13 @@
 
 	/* for loco Cap 7" only */
 	polytouch: edt-ft5x06@38 {
-		compatible = "edt,edt-ft5336";
+		compatible = "edt,edt-eng-ft5336";
 		reg = <0x38>;
 		pinctrl-names = "default";		
 		pinctrl-0 = <&pinctrl_edt_ft5x06>;
 		interrupt-parent = <&gpio5>;
 		interrupts = <0 0>;	
 		reset-gpios = <&gpio4 18 1>;
-	//	x_max = 800;
-	//	y_max = 480;
 	};
 
 };

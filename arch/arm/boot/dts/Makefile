@@ -366,11 +366,12 @@ dtb-$(CONFIG_SOC_IMX6SX) += \
 	imx6sx-19x19-arm2.dtb \
 	imx6sx-19x19-arm2-ldo.dtb \
 	imx6sx-19x19-arm2-csi.dtb \
-	imx6sx-19x19-arm2-gpmi-weim.dtb
+	imx6sx-19x19-arm2-gpmi-weim.dtb \
 	imx6sx-icore.dtb \
 	imx6sx-icore-icu.dtb \
-	imx6sx-smarcore.dtb \
+	imx6sx-smarcore.dtb 
 dtb-$(CONFIG_SOC_IMX6UL) += \
+	imx6ul-gea.dtb \
 	imx6ul-14x14-ddr3-arm2.dtb \
 	imx6ul-14x14-ddr3-arm2-emmc.dtb	\
 	imx6ul-14x14-ddr3-arm2-flexcan2.dtb \
@@ -386,7 +387,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-9x9-evk.dtb \
 	imx6ul-9x9-evk-btwifi.dtb \
 	imx6ul-9x9-evk-csi.dtb \
-	imx6ul-9x9-evk-ldo.dtb
+	imx6ul-9x9-evk-ldo.dtb 
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-12x12-lpddr3-arm2.dtb \
 	imx7d-12x12-lpddr3-arm2-m4.dtb \

@@ -722,6 +722,7 @@
 					mask = <0x60>;
 				};
 
+#ifdef TOLTO_GEA
 				snvs_pwrkey: snvs-powerkey {
 					compatible = "fsl,sec-v4.0-pwrkey";
 					regmap = <&snvs>;
@@ -729,6 +730,7 @@
 					linux,keycode = <KEY_POWER>;
 					wakeup;
 				};
+#endif
 			};
 
 			epit1: epit@020d0000 {

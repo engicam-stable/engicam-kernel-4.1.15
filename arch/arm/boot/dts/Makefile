@@ -372,6 +372,7 @@ dtb-$(CONFIG_SOC_IMX6SX) += \
 	imx6sx-smarcore.dtb 
 dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-gea.dtb \
+	imx6ul-gea-emmc.dtb \
 	imx6ul-gea-lococap-7.dtb \
 	imx6ul-gea-loco7.dtb \
 	imx6ul-gea-loco43.dtb \

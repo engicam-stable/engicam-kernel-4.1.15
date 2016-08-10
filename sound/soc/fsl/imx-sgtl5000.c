@@ -55,6 +55,96 @@ static const struct snd_soc_dapm_widget imx_sgtl5000_dapm_widgets[] = {
 	SND_SOC_DAPM_SPK("Ext Spk", NULL),
 };
 
+static int mx6ul_sgtl5000_probe(struct platform_device *pdev)
+{
+	struct device_node *cpu_np, *codec_np;
+	struct platform_device *cpu_pdev;
+	struct i2c_client *codec_dev;
+	struct imx_sgtl5000_data *data = NULL;
+	int ret;
+
+	cpu_np = of_parse_phandle(pdev->dev.of_node, "cpu-dai", 0);
+	codec_np = of_parse_phandle(pdev->dev.of_node, "audio-codec", 0);
+	if (!cpu_np || !codec_np) {
+		dev_err(&pdev->dev, "phandle missing or invalid\n");
+		ret = -EINVAL;
+		goto fail;
+	}
+
+	cpu_pdev = of_find_device_by_node(cpu_np);
+	if (!cpu_pdev) {
+		dev_err(&pdev->dev, "failed to find SSI platform device\n");
+		ret = -EPROBE_DEFER;
+		goto fail;
+	}
+	codec_dev = of_find_i2c_device_by_node(codec_np);
+	if (!codec_dev) {
+		dev_err(&pdev->dev, "failed to find codec platform device\n");
+		return -EPROBE_DEFER;
+	}
+
+	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
+	if (!data) {
+		ret = -ENOMEM;
+		goto fail;
+	}
+
+	data->codec_clk = clk_get(&codec_dev->dev, NULL);
+	if (IS_ERR(data->codec_clk)) {
+		ret = PTR_ERR(data->codec_clk);
+		goto fail;
+	}
+
+	data->clk_frequency = clk_get_rate(data->codec_clk);
+
+	data->dai.name = "HiFi";
+	data->dai.stream_name = "HiFi";
+	data->dai.codec_dai_name = "sgtl5000";
+	data->dai.codec_of_node = codec_np;
+	data->dai.cpu_of_node = cpu_np;
+	data->dai.platform_of_node = cpu_np;
+	data->dai.init = &imx_sgtl5000_dai_init;
+	data->dai.dai_fmt = SND_SOC_DAIFMT_I2S | SND_SOC_DAIFMT_NB_NF |
+			    SND_SOC_DAIFMT_CBM_CFM;
+
+	data->card.dev = &pdev->dev;
+	ret = snd_soc_of_parse_card_name(&data->card, "model");
+	if (ret)
+		goto fail;
+	ret = snd_soc_of_parse_audio_routing(&data->card, "audio-routing");
+	if (ret)
+		goto fail;
+	data->card.num_links = 1;
+	data->card.owner = THIS_MODULE;
+	data->card.dai_link = &data->dai;
+	data->card.dapm_widgets = imx_sgtl5000_dapm_widgets;
+	data->card.num_dapm_widgets = ARRAY_SIZE(imx_sgtl5000_dapm_widgets);
+
+	platform_set_drvdata(pdev, &data->card);
+	snd_soc_card_set_drvdata(&data->card, data);
+
+	ret = devm_snd_soc_register_card(&pdev->dev, &data->card);
+	if (ret) {
+		dev_err(&pdev->dev, "snd_soc_register_card failed (%d)\n", ret);
+		goto fail;
+	}
+
+	of_node_put(cpu_np);
+	of_node_put(codec_np);
+
+	return 0;
+
+fail:
+	if (data && !IS_ERR(data->codec_clk))
+		clk_put(data->codec_clk);
+	if (cpu_np)
+		of_node_put(cpu_np);
+	if (codec_np)
+		of_node_put(codec_np);
+
+	return ret;
+}
+
 static int imx_sgtl5000_probe(struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
@@ -64,6 +154,10 @@ static int imx_sgtl5000_probe(struct platform_device *pdev)
 	struct imx_sgtl5000_data *data = NULL;
 	int int_port, ext_port;
 	int ret;
+
+	/* MX6UL hasn't AUDMUX... different probe function */
+	if (!of_find_property(np, "mux-int-port", NULL))
+		return(mx6ul_sgtl5000_probe(pdev));
 
 	ret = of_property_read_u32(np, "mux-int-port", &int_port);
 	if (ret) {

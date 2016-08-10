@@ -306,23 +306,22 @@
 };
 
 &usdhc1 {
-//	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
-//	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-//	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
-//	cd-gpios = <&gpio1 19 0>;
-	non-removable;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
+	vmmc-supply = <&reg_out_3v3>;
 	bus-width = <4>;
-	keep-power-in-suspend;
 	enable-sdio-wakeup;
+	keep-power-in-suspend;
 	status = "okay";
 };
+
 
 &usdhc2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	no-1-8-v;
+	vmmc-supply = <&reg_out_3v3>;
 	keep-power-in-suspend;
 	non-removable;
 	status = "okay";

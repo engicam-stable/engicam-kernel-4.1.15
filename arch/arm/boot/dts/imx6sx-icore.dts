@@ -357,6 +357,8 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
 	status = "okay"; 
+	fsl,legacy-bch-geometry;
+	nand-on-flash-bbt;
 };
 
 &usbotg1 {

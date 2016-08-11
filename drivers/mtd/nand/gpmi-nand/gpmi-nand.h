@@ -197,7 +197,9 @@ struct gpmi_nand_data {
 	dma_addr_t		auxiliary_phys;
 
 	void			*raw_buffer;
-
+	/* legacy bch geometry flag */
+	bool			legacy_bch_geometry;
+ 
 	/* DMA channels */
 #define DMA_CHANS		8
 	struct dma_chan		*dma_chans[DMA_CHANS];

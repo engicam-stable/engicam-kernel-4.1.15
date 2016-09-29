@@ -363,6 +363,14 @@
 	status = "okay";
 };
 
+&usdhc3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc3_1>;
+	no-1-8-v;
+	non-removable;
+	status = "okay";
+};
+
 &iomuxc {
 	audmux {
 		pinctrl_audmux_1: audmux-1 {

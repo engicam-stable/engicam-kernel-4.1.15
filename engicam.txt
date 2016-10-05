@@ -1,0 +1,23 @@
+
+
+############################################
+DEFCONFIG:
+
+Default .config for geamx6ul SOM:
+geamx6ul_defconfig
+
+Default .config for icoremx6 SOM:
+icoremx6_defconfig
+
+############################################
+DEVICE TREE:
+
+for Engicam starterkit carrier:
+
+geamx6ul-starterkit.dtb
+
+geamx6ul-starterkit-emmc.dtb
+
+icoremx6dl-starterkit.dtb
+
+icoremx6q-starterkit.dtb

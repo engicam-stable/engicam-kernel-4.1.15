@@ -264,7 +264,8 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-gw54xx.dtb \
 	imx6dl-gw552x.dtb \
 	imx6dl-hummingboard.dtb \
-	imx6dl-icore.dtb \
+	icoremx6dl-starterkit.dtb \
+	icoremx6q-starterkit.dtb \
 	imx6dl-icore-rqs.dtb \
 	imx6dl-ofres.dtb \
 	imx6dl-ofcap.dtb \
@@ -305,7 +306,6 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-gw54xx.dtb \
 	imx6q-gw552x.dtb \
 	imx6q-hummingboard.dtb \
-	imx6q-icore.dtb \
 	imx6q-icore-mipi.dtb \
 	imx6q-icore-rqs.dtb \
 	imx6q-ofres.dtb \
@@ -370,10 +370,10 @@ dtb-$(CONFIG_SOC_IMX6SX) += \
 	imx6sx-19x19-arm2-gpmi-weim.dtb \
 	imx6sx-icore.dtb \
 	imx6sx-icore-icu.dtb \
-	imx6sx-smarcore.dtb 
+	imx6sx-smarcore.dtb
 dtb-$(CONFIG_SOC_IMX6UL) += \
-	imx6ul-gea.dtb \
-	imx6ul-gea-emmc.dtb \
+	geamx6ul-starterkit.dtb \
+	geamx6ul-starterkit-emmc.dtb \
 	imx6ul-gea-lococap-7.dtb \
 	imx6ul-gea-loco7.dtb \
 	imx6ul-gea-loco43.dtb \
@@ -392,7 +392,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ul-9x9-evk.dtb \
 	imx6ul-9x9-evk-btwifi.dtb \
 	imx6ul-9x9-evk-csi.dtb \
-	imx6ul-9x9-evk-ldo.dtb 
+	imx6ul-9x9-evk-ldo.dtb
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-12x12-lpddr3-arm2.dtb \
 	imx7d-12x12-lpddr3-arm2-m4.dtb \

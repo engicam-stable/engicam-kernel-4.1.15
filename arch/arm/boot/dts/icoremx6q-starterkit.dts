@@ -32,10 +32,11 @@
 /* To be enabled for PCI peripheral.
    Please enable also the PCI support kernel options:
    CONFIG_PCI and PCI_IMX6
-&pcie {
-	status = "okay";
-};
 */
+&pcie {
+	status = "disabled";
+};
+
 
 &sata {
 	status = "okay";
@@ -48,7 +49,9 @@
 		reg = <0x48>;
 		interrupt-parent = <&gpio3>;
 		interrupts = <31 2>;
-		work-mode = <0>;/*DCM mode*/
+		work-mode = <0>;/*DCM mode*/		
+		pinctrl-names = "default";		
+		pinctrl-0 = <&pinctrl_max11801>;
 	};
 
 };
@@ -73,15 +76,6 @@
 		VDDD-supply = <&reg_1p8v>;
 	};
 
-	polytouch: edt-ft5x06@38 {
-		compatible = "edt,edt-ft5406";
-		reg = <0x38>;
-		pinctrl-0 = <&pinctrl_edt_ft5x06>;
-		interrupt-parent = <&gpio5>;
-		interrupts = <30 0>;	
-		reset-gpios = <&gpio6 0 1>;
-	};
-
 	adv7180: adv7180@21 {
 		compatible = "adv,adv7180";
 		reg = <0x21>;
@@ -103,19 +97,13 @@
 
 &iomuxc {
 	touchpanel{
-		pinctrl_edt_ft5x06:  edt-ft5x06grp  {
+	  pinctrl_max11801:max11801 {
 			fsl,pins = <
-				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
-				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1b0b0 /*reset edt*/
-			>;
-		};
+			    MX6QDL_PAD_EIM_D31__GPIO3_IO31 0x80000000 /* int for max11801 */
+			>;	    
+	  };
 	};
-};
-
-&iomuxc {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
-
+	
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
@@ -125,4 +113,3 @@
 		};
 	};
 };
-

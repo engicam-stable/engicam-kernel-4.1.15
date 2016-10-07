@@ -307,6 +307,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6q-hummingboard.dtb \
 	imx6q-icore.dtb \
 	imx6q-icore-mipi.dtb \
+	imx6q-icore-tc358743.dtb \
 	imx6q-icore-rqs.dtb \
 	imx6q-ofres.dtb \
 	imx6q-ofcap.dtb \

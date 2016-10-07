@@ -175,7 +175,13 @@
 		hdmi-controller = <&hdmi_audio>;
 	};
 
-	v4l2_cap_0 {
+	sound_hdmi_input: sound_hdmi_input {
+		compatible = "fsl,imx-audio-tc358743";
+		model = "imx-audio-tc358743";
+		status = "disabled";
+	};
+
+	v4l2_cap_0: v4l2_cap_0 {
 		compatible = "fsl,imx6q-v4l2-capture";
 		ipu_id = <0>;
 		csi_id = <0>;
@@ -183,12 +189,10 @@
 		status = "okay";
 	};
 
-	v4l2_cap_1 {
+	v4l2_cap_1: v4l2_cap_1 {
 		compatible = "fsl,imx6q-v4l2-capture";
-		ipu_id = <0>;
-		csi_id = <1>;
 		mclk_source = <0>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	v4l2_out {

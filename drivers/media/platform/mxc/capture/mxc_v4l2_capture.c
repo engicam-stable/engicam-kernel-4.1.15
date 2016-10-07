@@ -18,6 +18,7 @@
  *
  * @ingroup MXC_V4L2_CAPTURE
  */
+
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -34,8 +35,11 @@
 #include <linux/fb.h>
 #include <linux/dma-mapping.h>
 #include <linux/delay.h>
+#include <linux/mfd/syscon.h>
+#include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
 #include <linux/mxcfb.h>
 #include <linux/of_device.h>
+#include <linux/regmap.h>
 #include <media/v4l2-chip-ident.h>
 #include <media/v4l2-ioctl.h>
 #include <media/v4l2-device.h>
@@ -1555,6 +1559,8 @@ static int mxc_v4l_dqueue(cam_data *cam, struct v4l2_buffer *buf)
 	return retval;
 }
 
+unsigned long csi_in_use;
+
 /*!
  * V4L interface - open function
  *
@@ -1572,6 +1578,7 @@ static int mxc_v4l_open(struct file *file)
 	cam_data *cam = video_get_drvdata(dev);
 	int err = 0;
 	struct sensor_data *sensor;
+	int csi_bit;
 
 	pr_debug("\nIn MVC: mxc_v4l_open\n");
 	pr_debug("   device name is %s\n", dev->name);
@@ -1601,6 +1608,41 @@ static int mxc_v4l_open(struct file *file)
 		goto oops;
 
 	if (cam->open_count++ == 0) {
+		struct regmap *gpr;
+
+		csi_bit = (cam->ipu_id << 1) | cam->csi;
+
+		if (test_and_set_bit(csi_bit, &csi_in_use)) {
+			pr_err("%s: %s CSI already in use\n", __func__, dev->name);
+			err = -EBUSY;
+			cam->open_count = 0;
+			goto oops;
+		}
+		cam->csi_in_use = 1;
+
+		gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+		if (!IS_ERR(gpr)) {
+			if (of_machine_is_compatible("fsl,imx6q")) {
+				if (cam->ipu_id == cam->csi) {
+					unsigned shift = 19 + cam->csi;
+					unsigned mask = 1 << shift;
+					unsigned val = (cam->mipi_camera ? 0 : 1) << shift;
+					printk("updating GPR1 for MIPI mipi_camera=%d\n", cam->mipi_camera);
+
+					regmap_update_bits(gpr, IOMUXC_GPR1, mask, val);
+				}
+			} else {
+				unsigned shift = cam->csi * 3;
+				unsigned mask = 7 << shift;
+				unsigned val = (cam->mipi_camera ? csi_bit : 4) << shift;
+
+				regmap_update_bits(gpr, IOMUXC_GPR13, mask, val);
+			}
+		} else {
+			pr_err("%s: failed to find fsl,imx6q-iomux-gpr regmap\n",
+			       __func__);
+		}
+
 		wait_event_interruptible(cam->power_queue,
 					 cam->low_power == false);
 
@@ -1697,7 +1739,8 @@ static int mxc_v4l_open(struct file *file)
 					cam->crop_bounds.height,
 					cam_fmt.fmt.pix.pixelformat,
 					csi_param);
-		clk_prepare_enable(sensor->sensor_clk);
+		if (!IS_ERR(sensor->sensor_clk))
+			clk_prepare_enable(sensor->sensor_clk);
 		vidioc_int_s_power(cam->sensor, 1);
 		vidioc_int_init(cam->sensor);
 		vidioc_int_dev_init(cam->sensor);
@@ -1758,7 +1801,8 @@ static int mxc_v4l_close(struct file *file)
 
 	if (--cam->open_count == 0) {
 		vidioc_int_s_power(cam->sensor, 0);
-		clk_disable_unprepare(sensor->sensor_clk);
+		if (!IS_ERR(sensor->sensor_clk))
+			clk_disable_unprepare(sensor->sensor_clk);
 		wait_event_interruptible(cam->power_queue,
 					 cam->low_power == false);
 		pr_debug("mxc_v4l_close: release resource\n");
@@ -1782,6 +1826,13 @@ static int mxc_v4l_close(struct file *file)
 		wake_up_interruptible(&cam->enc_queue);
 		mxc_free_frames(cam);
 		cam->enc_counter++;
+
+		if (cam->csi_in_use) {
+			int csi_bit = (cam->ipu_id << 1) | cam->csi;
+
+			clear_bit(csi_bit, &csi_in_use);
+			cam->csi_in_use = 0;
+		}
 	}
 
 	up(&cam->busy_lock);
@@ -2624,7 +2675,7 @@ static int init_camera_struct(cam_data *cam, struct platform_device *pdev)
 	const struct of_device_id *of_id =
 			of_match_device(mxc_v4l2_dt_ids, &pdev->dev);
 	struct device_node *np = pdev->dev.of_node;
-	int ipu_id, csi_id, mclk_source;
+	int ipu_id, csi_id, mclk_source, mipi_camera;
 	int ret = 0;
 	struct v4l2_device *v4l2_dev;
 
@@ -2647,6 +2698,10 @@ static int init_camera_struct(cam_data *cam, struct platform_device *pdev)
 		dev_err(&pdev->dev, "sensor mclk missing or invalid\n");
 		return ret;
 	}
+
+	ret = of_property_read_u32(np, "mipi_camera", &mipi_camera);
+	if (ret)
+		mipi_camera = 0;
 
 	/* Default everything to 0 */
 	memset(cam, 0, sizeof(cam_data));
@@ -2736,6 +2791,7 @@ static int init_camera_struct(cam_data *cam, struct platform_device *pdev)
 
 	cam->ipu_id = ipu_id;
 	cam->csi = csi_id;
+	cam->mipi_camera = mipi_camera;
 	cam->mclk_source = mclk_source;
 	cam->mclk_on[cam->mclk_source] = false;
 
@@ -3018,8 +3074,9 @@ static int mxc_v4l2_master_attach(struct v4l2_int_device *slave)
 		return -1;
 	}
 
-	if (sdata->csi != cam->csi) {
-		pr_debug("%s: csi doesn't match\n", __func__);
+	if ((sdata->ipu_id != cam->ipu_id) || (sdata->csi != cam->csi) || (sdata->mipi_camera != cam->mipi_camera)) {
+		pr_info("%s: ipu(%d:%d)/csi(%d:%d)/mipi(%d:%d) doesn't match\n", __func__,
+			sdata->ipu_id, cam->ipu_id, sdata->csi, cam->csi, sdata->mipi_camera, cam->mipi_camera);
 		return -1;
 	}
 

@@ -451,6 +451,8 @@
 		};
 	};
 
+#define MX6QDL_PAD_GPIO_16__ENET_REF_CLK_SION            0x214 0x5e4 0x80c 0x12 0x0
+
 	enet {
 		pinctrl_enet_1: enetgrp-1 {
 			fsl,pins = <
@@ -519,8 +521,7 @@
 		pinctrl_enet_4: enetgrp-4 {
 			fsl,pins = <
 				MX6QDL_PAD_ENET_CRS_DV__ENET_RX_EN 	0x1b0b0
-				MX6QDL_PAD_GPIO_16__ENET_REF_CLK	0x1b0b1
-//				MX6QDL_PAD_ENET_RX_ER__ENET_RX_ER	0x1b0b0
+				MX6QDL_PAD_GPIO_16__ENET_REF_CLK_SION	0x1b0b1
 				MX6QDL_PAD_ENET_TX_EN__ENET_TX_EN	0x1b0b0
 				MX6QDL_PAD_ENET_RXD1__ENET_RX_DATA1	0x1b0b0
 				MX6QDL_PAD_ENET_RXD0__ENET_RX_DATA0	0x1b0b0
@@ -530,6 +531,7 @@
 				MX6QDL_PAD_ENET_MDIO__ENET_MDIO		0x1b0b0
 				MX6QDL_PAD_ENET_REF_CLK__GPIO1_IO23	0x1b0b0
 				MX6QDL_PAD_GPIO_17__GPIO7_IO12		0x1b0b0
+				MX6QDL_PAD_EIM_BCLK__GPIO6_IO31		0x1b0b0 /* EDIMM 1.5 or 1.0 GPIO signal */
 			>;
 		};
 

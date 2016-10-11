@@ -41,6 +41,8 @@
 #include "cpuidle.h"
 #include "hardware.h"
 
+static int edimm_ver = 10;
+
 /* For imx6q sabrelite board: set KSZ9021RN RGMII pad skew */
 static int ksz9021rn_phy_fixup(struct phy_device *phydev)
 {
@@ -200,6 +202,42 @@ static void __init imx6q_enet_phy_init(void)
 	}
 }
 
+#define ICORE_GPIO_EDIMM_VER 191 /* GPIO6_31 */
+
+static void __init icore_set_enet_clock(void)
+{
+	int icore_ver_gpio;
+	struct regmap *gpr;
+	
+	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+	
+	icore_ver_gpio = ICORE_GPIO_EDIMM_VER;
+	
+	if (gpio_is_valid(icore_ver_gpio) &&
+	    !gpio_request_one(icore_ver_gpio, GPIOF_DIR_IN, "icore_ver_gpio"))
+	{
+		gpio_direction_input(icore_ver_gpio);
+	
+		if(!gpio_get_value(icore_ver_gpio))
+		{
+			edimm_ver = 15;
+			printk("i.Core M6 1.5 version\n");
+			regmap_update_bits(gpr, IOMUXC_GPR1,
+					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+					IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
+		}		
+		else
+		{
+			edimm_ver = 10;
+			printk("i.Core M6 standard 1.0 version\n");
+			regmap_update_bits(gpr, IOMUXC_GPR1,
+					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+					IMX6Q_GPR1_ENET_CLK_SEL_PAD);
+		}
+		gpio_free(icore_ver_gpio);
+	}
+}
+
 static void __init imx6q_1588_init(void)
 {
 	struct device_node *np;
@@ -225,11 +263,6 @@ static void __init imx6q_1588_init(void)
 	 */
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
 	if (!IS_ERR(gpr))
-		if (of_machine_is_compatible("fsl,imx6-icore"))
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_PAD);
-		else
 			regmap_update_bits(gpr, IOMUXC_GPR1,
 					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
 					IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
@@ -464,6 +497,11 @@ static void __init icore_late_init(void)
 	struct pinctrl *pctl;
 	int icore_ver_gpio;
 
+	icore_set_enet_clock();
+
+	if(edimm_ver == 15) /* EDIMM 1.5 */
+		return;
+
 	np = of_find_node_by_path("/soc/aips-bus@02100000/usb@02184000");
 //	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-usb");
 	pdev = of_find_device_by_node(np);
@@ -496,6 +534,7 @@ put_node:
 	of_node_put(np);
 
 }
+
 
 static void __init icore_rqs_late_init(void)
 {

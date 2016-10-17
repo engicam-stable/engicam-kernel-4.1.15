@@ -375,6 +375,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	geamx6ul-starterkit.dtb \
 	geamx6ul-starterkit-emmc.dtb \
 	isiot-imx6ul.dtb \
+	isiot-imx6ul-emmc.dtb \
 	imx6ul-gea-lococap-7.dtb \
 	imx6ul-gea-loco7.dtb \
 	imx6ul-gea-loco43.dtb \

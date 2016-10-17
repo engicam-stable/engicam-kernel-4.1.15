@@ -29,19 +29,6 @@
 	status = "okay";
 };
 
-/* To be enabled for PCI peripheral.
-   Please enable also the PCI support kernel options:
-   CONFIG_PCI and PCI_IMX6
-*/
-&pcie {
-	status = "disabled";
-};
-
-
-&sata {
-	status = "okay";
-};
-
 &i2c1 {
 
 	max11801@48 {
@@ -80,7 +67,7 @@
 		compatible = "adv,adv7180";
 		reg = <0x21>;
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_ipu1_6>;
+		pinctrl-0 = <&pinctrl_ipu1_2>;
 		clocks = <&clks 201>;
 		clock-names = "csi_mclk";
 		DOVDD-supply = <&reg_3p3v>; /* 3.3v, enabled via 2.8 VGEN6 */
@@ -92,8 +79,13 @@
 		mclk_source = <0>;
 		cvbs = <1>;
 	};
-	
 };
+
+&sata {
+	status = "okay";
+};
+
+
 
 &iomuxc {
 	touchpanel{

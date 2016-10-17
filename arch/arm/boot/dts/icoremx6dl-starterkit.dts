@@ -49,7 +49,6 @@
 		compatible = "fsl,imx6-hdmi-i2c";
 		reg = <0x50>;
 	};
-
 };
 
 
@@ -80,68 +79,8 @@
 		mclk_source = <0>;
 		cvbs = <1>;
 	};
-	
 };
 
-/* To be enabled for PCI peripheral.
-   Please enable also the PCI support kernel options:
-   CONFIG_PCI and PCI_IMX6
-&pcie {
-	status = "okay";
-};
-*/
-
-&i2c1 {
-
-	max11801@48 {
-		compatible = "maxim,max11801";
-		reg = <0x48>;
-		interrupt-parent = <&gpio3>;
-		interrupts = <31 2>;
-		work-mode = <0>;/*DCM mode*/
-	};
-
-};
-
-&i2c2 {
-
-	hdmi: edid@50 {
-		compatible = "fsl,imx6-hdmi-i2c";
-		reg = <0x50>;
-	};
-
-};
-
-
-&i2c3 {
-
-	codec: sgtl5000@0a {
-		compatible = "fsl,sgtl5000";
-		reg = <0x0a>;
-		clocks = <&clks 201>;
-		VDDA-supply = <&reg_2p5v>;
-		VDDIO-supply = <&reg_3p3v>;
-	};
-
-
-	adv7180: adv7180@21 {
-		compatible = "adv,adv7180";
-		reg = <0x21>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_ipu1_6>;
-		clocks = <&clks 201>;
-		clock-names = "csi_mclk";
-		DOVDD-supply = <&reg_3p3v>; /* 3.3v, enabled via 2.8 VGEN6 */
-		AVDD-supply = <&reg_3p3v>;  /* 1.8v */
-		DVDD-supply = <&reg_3p3v>;  /* 1.8v */
-		PVDD-supply = <&reg_3p3v>;  /* 1.8v */
-		pwn-gpios = <&gpio3 19 0>;  /* put on not used pin */
-		csi_id = <0>;
-		mclk = <24000000>;
-		mclk_source = <0>;
-		cvbs = <1>;
-	};
-};
 
 &iomuxc {
 	touchpanel{

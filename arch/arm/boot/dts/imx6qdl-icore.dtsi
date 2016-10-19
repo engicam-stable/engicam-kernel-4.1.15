@@ -353,6 +353,7 @@
 	pinctrl-1 = <&pinctrl_usbotg_3>;
 	disable-over-current;
 	ver-gpios = <&gpio7 2 0>;
+	dr_mode="otg";
 	status = "okay";
 };
 

@@ -195,14 +195,7 @@
 	display0: display {
 		bits-per-pixel = <16>;
 		bus-width = <18>;
-#define AMPIRE
-#ifdef AMPIRE
-/*	Da togliere
-	 "Amp-WD" , 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
-	 FB_SYNC_CLK_LAT_FALL,
-	 FB_VMODE_NONINTERLACED,
-	 0,},
-*/
+
 		display-timings {
 			native-mode = <&timing0>;
 			timing0: timing0 {
@@ -222,33 +215,6 @@
 			pixelclk-active = <0>;
 			};
 		};
-#else
-/*	Da togliere
-	 "URT-WVGA", 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
-	 FB_SYNC_CLK_IDLE_EN,
-	 FB_VMODE_NONINTERLACED,
-	 0,},
-*/
-		display-timings {
-			native-mode = <&timing0>;
-			timing0: timing0 {
-			clock-frequency = <28000000>;
-			hactive = <800>;
-			vactive = <480>;
-			hfront-porch = <30>;
-			hback-porch = <30>;
-			hsync-len = <64>;
-			vback-porch = <5>;
-			vfront-porch = <5>;
-			vsync-len = <20>;
-
-			hsync-active = <0>;
-			vsync-active = <0>;
-			de-active = <1>;
-			pixelclk-active = <1>;
-			};
-		};
-#endif
 	};
 };
 
@@ -295,6 +261,12 @@
 	status = "okay";
 };
 
+&uart8 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart8>;	
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
 
 &usbotg1 {
 	dr_mode = "peripheral";
@@ -345,18 +317,6 @@
 		VDDIO-supply = <&reg_out_3v3>;
 		VDDD-supply = <&reg_out_1v8>;
 	};
-
-	/* for C.TOUCH.Wi 7" only */
-	polytouch: st1232_ts@55 {
-		compatible = "sitronix,st1232-ts";
-		reg = <0x55>;
-		pinctrl-names = "default";		
-		pinctrl-0 = <&pinctrl_st1232_ts>;
-		interrupt-parent = <&gpio5>;
-		interrupts = <0 0>;	
-		reset-gpios = <&gpio4 18 1>;
-	};
-
 };
 
 &i2c2 {
@@ -365,18 +325,6 @@
 	pinctrl-0 = <&pinctrl_i2c2>;
 	status = "okay";
 };
-
-&iomuxc {
-	touchpanel{
-		pinctrl_st1232_ts:  st1232-tsgrp  {
-			fsl,pins = <
-				MX6UL_PAD_SNVS_TAMPER0__GPIO5_IO00	0x1b0b0 /*interrupt*/ 
-				MX6UL_PAD_CSI_PIXCLK__GPIO4_IO18 	0x1b0b0 /*reset edt*/
-			>;
-		};
-	};
-};
-
 
 &iomuxc {
 	pinctrl-names = "default";
@@ -504,6 +452,14 @@
 				MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX	0x1b0b1
 				MX6UL_PAD_UART3_RX_DATA__UART2_DCE_RTS	0x1b0b1
 				MX6UL_PAD_UART3_TX_DATA__UART2_DCE_CTS	0x1b0b1
+			>;
+		};
+
+		pinctrl_uart8: uart8grp {
+				fsl,pins = <
+				MX6UL_PAD_LCD_DATA20__UART8_DCE_TX	0x1b0b1
+				MX6UL_PAD_LCD_DATA21__UART8_DCE_RX	0x1b0b1
+				MX6UL_PAD_ENET2_TX_CLK__UART8_DCE_CTS	0x1b0b0
 			>;
 		};
 

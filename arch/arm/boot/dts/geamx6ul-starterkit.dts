@@ -242,7 +242,8 @@
 	status = "okay";
 	xnur-gpio = <&gpio1 3 0>;
 	measure_delay_time = <0x1ffff>;
-	pre_charge_time = <0x1fff>;
+	pre_charge_time = <0xfff>;
+	status = "okay";
 };
 
 &uart1 {

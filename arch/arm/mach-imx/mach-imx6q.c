@@ -238,41 +238,6 @@ static void __init icore_set_enet_clock(void)
 	}
 }
 
-static void __init imx6q_1588_init(void)
-{
-	struct device_node *np;
-	struct clk *ptp_clk;
-	struct regmap *gpr;
-
-	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-fec");
-	if (!np) {
-		pr_warn("%s: failed to find fec node\n", __func__);
-		return;
-	}
-
-	ptp_clk = of_clk_get(np, 2);
-	if (IS_ERR(ptp_clk)) {
-		pr_warn("%s: failed to get ptp clock\n", __func__);
-		goto put_node;
-	}
-
-	/*
-	 * If enet_ref from ANATOP/CCM is the PTP clock source, we need to
-	 * set bit IOMUXC_GPR1[21].  Or the PTP clock must be from pad
-	 * (external OSC), and we need to clear the bit.
-	 */
-	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
-	if (!IS_ERR(gpr))
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
-	else
-		pr_err("failed to find fsl,imx6q-iomux-gpr regmap\n");
-
-	clk_put(ptp_clk);
-put_node:
-	of_node_put(np);
-}
 
 static void __init imx6q_csi_mux_init(void)
 {
@@ -373,7 +338,7 @@ static inline void imx6q_enet_init(void)
 {
 	imx6_enet_mac_init("fsl,imx6q-fec", "fsl,imx6q-ocotp");
 	imx6q_enet_phy_init();
-	imx6q_1588_init();
+
 	if (cpu_is_imx6q() && imx_get_soc_revision() == IMX_CHIP_REVISION_2_0)
 		imx6q_enet_clk_sel();
 }

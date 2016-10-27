@@ -30,6 +30,7 @@
  * around this by not polling these bits but only wait a fixed delay.
  */
 
+#define DEBUG
 #include <linux/init.h>
 #include <linux/io.h>
 #include <linux/module.h>
@@ -428,6 +429,7 @@ static void fsl_ssi_config(struct fsl_ssi_private *ssi_private, bool enable,
 	u32 scr_val;
 	int keep_active;
 
+	printk("fsl_ssi_config enable=%d\n", enable);
 	regmap_read(regs, CCSR_SSI_SCR, &scr_val);
 
 	nr_active_streams = !!(scr_val & CCSR_SSI_SCR_TE) +
@@ -464,6 +466,8 @@ static void fsl_ssi_config(struct fsl_ssi_private *ssi_private, bool enable,
 
 		goto config_done;
 	}
+
+	printk("fsl_ssi_config 2 enable=%d\n", enable);
 
 	/*
 	 * Configure single direction units while the SSI unit is running
@@ -599,6 +603,7 @@ static int fsl_ssi_startup(struct snd_pcm_substream *substream,
 		snd_soc_dai_get_drvdata(rtd->cpu_dai);
 	int ret;
 
+	printk("fsl_ssi_startup\n");
 	ret = clk_prepare_enable(ssi_private->clk);
 	if (ret)
 		return ret;
@@ -656,11 +661,15 @@ static int fsl_ssi_set_bclk(struct snd_pcm_substream *substream,
 	unsigned int freq;
 	bool baudclk_is_used;
 
+	printk("fsl_ssi_set_bclk\n");
+
 	/* Prefer the explicitly set bitclock frequency */
 	if (ssi_private->bitclk_freq)
 		freq = ssi_private->bitclk_freq;
 	else
 		freq = params_channels(hw_params) * 32 * params_rate(hw_params);
+
+	printk("fsl_ssi_set_bclk freq=%d\n", freq);
 
 	/* Don't apply it to any non-baudclk circumstance */
 	if (IS_ERR(ssi_private->baudclk))
@@ -748,6 +757,8 @@ static int fsl_ssi_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
 {
 	struct fsl_ssi_private *ssi_private = snd_soc_dai_get_drvdata(cpu_dai);
 
+	printk("fsl_ssi_set_dai_sysclk = %d\n", freq);
+	
 	ssi_private->bitclk_freq = freq;
 
 	return 0;
@@ -778,8 +789,12 @@ static int fsl_ssi_hw_params(struct snd_pcm_substream *substream,
 	u32 scr_val;
 	int enabled;
 
+	printk("fsl_ssi_hw_params\n");
+
 	regmap_read(regs, CCSR_SSI_SCR, &scr_val);
 	enabled = scr_val & CCSR_SSI_SCR_SSIEN;
+
+	printk("fsl_ssi_hw_params 1\n");
 
 	/*
 	 * If we're in synchronous mode, and the SSI is already enabled,
@@ -788,7 +803,10 @@ static int fsl_ssi_hw_params(struct snd_pcm_substream *substream,
 	if (enabled && ssi_private->cpu_dai_drv.symmetric_rates)
 		return 0;
 
+	printk("fsl_ssi_hw_params 2\n");
+
 	if (fsl_ssi_is_i2s_master(ssi_private)) {
+		printk("fsl_ssi_hw_params master\n");
 		ret = fsl_ssi_set_bclk(substream, cpu_dai, hw_params);
 		if (ret)
 			return ret;
@@ -809,11 +827,17 @@ static int fsl_ssi_hw_params(struct snd_pcm_substream *substream,
 		 * Switch to normal net mode in order to have a frame sync
 		 * signal every 32 bits instead of 16 bits
 		 */
+		printk("fsl_ssi_hw_params sample_size = %d\n", sample_size);
 		if (fsl_ssi_is_i2s_cbm_cfs(ssi_private) && sample_size == 16)
+		{
+			printk("fsl_ssi_hw_params i2smode network\n");
 			i2smode = CCSR_SSI_SCR_I2S_MODE_NORMAL |
 				CCSR_SSI_SCR_NET;
+		}		
 		else
 			i2smode = ssi_private->i2s_mode;
+
+		printk("fsl_ssi_hw_params i2smode=0x%x channels=%d\n", i2smode, channels);
 
 		regmap_update_bits(regs, CCSR_SSI_SCR,
 				CCSR_SSI_SCR_NET | CCSR_SSI_SCR_I2S_MODE_MASK,
@@ -865,6 +889,8 @@ static int _fsl_ssi_set_dai_fmt(struct device *dev,
 	struct regmap *regs = ssi_private->regs;
 	u32 strcr = 0, stcr, srcr, scr, mask;
 	u8 wm;
+
+	printk("_fsl_ssi_set_dai_fmt\n");
 
 	ssi_private->dai_fmt = fmt;
 
@@ -1045,6 +1071,8 @@ static int fsl_ssi_set_dai_tdm_slot(struct snd_soc_dai *cpu_dai, u32 tx_mask,
 	struct regmap *regs = ssi_private->regs;
 	u32 val;
 
+	printk("fsl_ssi_set_dai_tdm_slot\n");
+
 	/* The slot number should be >= 2 if using Network mode or I2S mode */
 	regmap_read(regs, CCSR_SSI_SCR, &val);
 	val &= CCSR_SSI_SCR_I2S_MODE_MASK | CCSR_SSI_SCR_NET;
@@ -1090,10 +1118,13 @@ static int fsl_ssi_trigger(struct snd_pcm_substream *substream, int cmd,
 	struct fsl_ssi_private *ssi_private = snd_soc_dai_get_drvdata(rtd->cpu_dai);
 	struct regmap *regs = ssi_private->regs;
 
+	printk("fsl_ssi_trigger cmd=%d\n",cmd);
+
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
 	case SNDRV_PCM_TRIGGER_RESUME:
 	case SNDRV_PCM_TRIGGER_PAUSE_RELEASE:
+		printk("fsl_ssi_trigger start\n");
 		if (substream->stream == SNDRV_PCM_STREAM_PLAYBACK)
 			fsl_ssi_tx_config(ssi_private, true);
 		else

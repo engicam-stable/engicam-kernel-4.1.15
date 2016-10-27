@@ -154,7 +154,7 @@
 		};
 	};
 
-	sound {
+	sound: sound {
 		compatible = "fsl,imx6q-icore-sgtl5000",
 			     "fsl,imx-audio-sgtl5000";
 		model = "imx6q-icore-sgtl5000";
@@ -168,7 +168,7 @@
 		mux-ext-port = <4>;
 	};
 
-	sound-hdmi {
+	sound_hdmi: sound_hdmi {
 		compatible = "fsl,imx6q-audio-hdmi",
 			     "fsl,imx-audio-hdmi";
 		model = "imx-audio-hdmi";
@@ -419,6 +419,16 @@
 				MX6QDL_PAD_DISP0_DAT23__AUD4_RXD  0x130b0
 			>;
 		};
+
+		pinctrl_audmux_5: audmux-5 {
+			fsl,pins = <
+				MX6QDL_PAD_DISP0_DAT16__AUD5_TXC  0x130b0
+				MX6QDL_PAD_DISP0_DAT17__AUD5_TXD  0x110b0
+				MX6QDL_PAD_DISP0_DAT18__AUD5_TXFS  0x130b0
+				MX6QDL_PAD_DISP0_DAT19__AUD5_RXD  0x130b0
+			>;
+		};
+
 	};
 
 	ecspi1 {

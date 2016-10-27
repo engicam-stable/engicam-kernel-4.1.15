@@ -169,6 +169,7 @@ static int imx_ssi_set_dai_sysclk(struct snd_soc_dai *cpu_dai,
 
 	scr = readl(ssi->base + SSI_SCR);
 
+	printk("\n\nimx_ssi_set_dai_sysclk clk_id = %d\n\n", clk_id);
 	switch (clk_id) {
 	case IMX_SSP_SYS_CLK:
 		if (dir == SND_SOC_CLOCK_OUT)

@@ -2386,7 +2386,7 @@ static int ioctl_s_parm(struct v4l2_int_device *s, struct v4l2_streamparm *a)
 	int ret = 0;
 
 	pr_info("%s (%d)\n", __func__, (u32)a->parm.capture.capturemode);
-	if (1)//(u32)a->parm.capture.capturemode == tc358743_mode_1080P_1920_1080) 
+	if (0)//(u32)a->parm.capture.capturemode == tc358743_mode_1080P_1920_1080) 
 	{
 		struct regmap *gpr;
 
@@ -2899,6 +2899,7 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	int ret;
 
+	pr_info("imxpac_tc358743_hw_params\n");
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_I2S |
 				SND_SOC_DAIFMT_NB_IF |
 				SND_SOC_DAIFMT_CBM_CFM);
@@ -2906,6 +2907,8 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 		pr_err("%s: failed set cpu dai format\n", __func__);
 		return ret;
 	}
+
+	pr_info("imxpac_tc358743_hw_params 1\n");
 
 	ret = snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S |
 				SND_SOC_DAIFMT_NB_NF |
@@ -2915,30 +2918,39 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 		return ret;
 	}
 
+	pr_info("imxpac_tc358743_hw_params 2\n");
+
 	ret = snd_soc_dai_set_sysclk(codec_dai, 0,
 				     CODEC_CLOCK, SND_SOC_CLOCK_OUT);
 	if (ret) {
 		pr_err("%s: failed setting codec sysclk\n", __func__);
 		return ret;
 	}
+
+	pr_info("imxpac_tc358743_hw_params 3\n");
 	snd_soc_dai_set_tdm_slot(cpu_dai, 0xffffffc, 0xffffffc, 2, 0);
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, IMX_SSP_SYS_CLK, 0,
 				SND_SOC_CLOCK_IN);
+
 	if (ret) {
 		pr_err("can't set CPU system clock IMX_SSP_SYS_CLK\n");
 		return ret;
 	}
+	pr_info("imxpac_tc358743_hw_params 4\n");
+
 #if 1
 	// clear SSI_SRCR_RXBIT0 and SSI_SRCR_RSHFD in order to push Right-justified MSB data from
 	{
 		struct fsl_ssi_private *ssi_private = snd_soc_dai_get_drvdata(cpu_dai);
 		struct regmap *regs = ssi_private->regs;
 
-		regmap_update_bits(regs, CCSR_SSI_STCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(16));
-		regmap_update_bits(regs, CCSR_SSI_SRCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(16));
+		regmap_update_bits(regs, CCSR_SSI_STCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(32));
+		regmap_update_bits(regs, CCSR_SSI_SRCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(32));
 	}
 #endif
+	pr_info("imxpac_tc358743_hw_params 5\n");
+
 	return 0;
 }
 
@@ -2977,24 +2989,26 @@ static int imx_audmux_config(int slave, int master)
 	slave = slave - 1;
 	master = master - 1;
 
-	/* SSI0 mastered by port 5 */
+	pr_info("imx_audmux_config master=%d, slave=%d\n", master, slave);
+
+	/* SSI0 mastered by port 4 */
 	ptcr = IMX_AUDMUX_V2_PTCR_SYN |
 		IMX_AUDMUX_V2_PTCR_TFSDIR |
-		IMX_AUDMUX_V2_PTCR_TFSEL(master | 0x8) |
+		IMX_AUDMUX_V2_PTCR_TFSEL(master) |
 		IMX_AUDMUX_V2_PTCR_TCLKDIR |
-		IMX_AUDMUX_V2_PTCR_RFSDIR |
-		IMX_AUDMUX_V2_PTCR_RFSEL(master | 0x8) |
-		IMX_AUDMUX_V2_PTCR_RCLKDIR |
-		IMX_AUDMUX_V2_PTCR_RCSEL(master | 0x8) |
-		IMX_AUDMUX_V2_PTCR_TCSEL(master | 0x8);
+		IMX_AUDMUX_V2_PTCR_TCSEL(master);
 	pdcr = IMX_AUDMUX_V2_PDCR_RXDSEL(master);
 	ret = imx_audmux_v2_configure_port(slave, ptcr, pdcr);
 	if (ret)
 		return ret;
 
 	ptcr = IMX_AUDMUX_V2_PTCR_SYN;
-	pdcr = IMX_AUDMUX_V2_PDCR_RXDSEL(master);
-	return imx_audmux_v2_configure_port(master, ptcr, pdcr);
+	pdcr = IMX_AUDMUX_V2_PDCR_RXDSEL(slave);
+	ret = imx_audmux_v2_configure_port(master, ptcr, pdcr);
+
+
+	pr_info("imx_audmux_config done ret=%d\n", ret);
+	return ret;
 }
 
 static struct snd_soc_dai_driver tc358743_dai;
@@ -3008,6 +3022,8 @@ static int imx_tc358743_probe(struct platform_device *pdev)
 	struct device_node *np = pdev->dev.of_node;
 	int int_port, ext_port;
 	int ret = 0;
+
+	pr_info("tc358743 Probing audio\n");
 
 	if (!g_td)
 		return -EPROBE_DEFER;
@@ -3149,6 +3165,7 @@ static int tc358743_mute(struct snd_soc_dai *dai, int mute)
 static int tc358743_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 				int clk_id, unsigned int freq, int dir)
 {
+	pr_info("tc358743_set_dai_sysclk\n");
 	return 0;
 }
 
@@ -3237,7 +3254,7 @@ static void report_netlink(struct tc_data *td)
 			tc358743_fps_list[td->fps], tc358743_audio_list[td->audio]);
 	kobject_uevent_env(&(sensor->i2c_client->dev.kobj), KOBJ_CHANGE, envp);
 	td->det_work_timeout = DET_WORK_TIMEOUT_DEFAULT;
-	pr_debug("%s: HDMI RX (%d) mode: %s fps: %d (%d, %d) audio: %d\n",
+	pr_info("%s: HDMI RX (%d) mode: %s fps: %d (%d, %d) audio: %d\n",
 		__func__, td->mode,
 		tc358743_mode_info_data[td->fps][td->mode].name, td->fps, td->bounce,
 		td->det_work_timeout, tc358743_audio_list[td->audio]);
@@ -3790,6 +3807,7 @@ static __init int tc358743_init(void)
 			__func__, err);
 #ifdef CONFIG_TC358743_AUDIO
 /* Audio setup */
+	pr_info("tc358743_init setting audio... ");
 	err = platform_driver_register(&imx_tc358743_audio1_driver);
 	if (err) {
 		pr_err("%s: Platform driver register failed, error=%d\n",

@@ -44,27 +44,52 @@
 	mipi_camera = <1>;
 };
 
-/*
+&ssi1 {
+	status = "okay";
+};
+
+&audmux {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_audmux_5>;
+	status = "okay";
+};
+
+&sound {
+	cpu-dai = <&ssi2>;
+	mux-int-port = <2>;
+	mux-ext-port = <5>;
+	status = "disabled";
+};
+
+&sound_hdmi {
+	status = "okay";
+};
+
+&ssi2 {
+	fsl,mode = "i2s-slave"; 
+	status = "okay";
+};
+
 &sound_hdmi_input {
-	ssi-controller = <&ssi1>;
+	cpu-dai = <&ssi1>;
 	mux-int-port = <1>;
 	mux-ext-port = <4>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_audmux_tc358743>;
-	status = "disabled";
+	pinctrl-0 = <&pinctrl_audmux_4>;
+	status = "okay";
 };
-*/
 
 /* To be enabled for PCI peripheral.
    Please enable also the PCI support kernel options:
    CONFIG_PCI and PCI_IMX6
-&pcie {
-	status = "okay";
-};
 */
+&pcie {
+	status = "disabled";
+};
+
 
 &sata {
-	status = "okay";
+	status = "disabled";
 };
 
 &i2c1 {
@@ -89,7 +114,6 @@
 
 
 &i2c3 {
-
 	codec: sgtl5000@0a {
 		compatible = "fsl,sgtl5000";
 		reg = <0x0a>;

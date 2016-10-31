@@ -411,7 +411,7 @@ static const struct reg_value tc358743_setting_YUV422_2lane_30fps_720P_1280_720_
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
 //  {0x8651, 0x00000003, 0x00000000, 1, 0},	// Inverted LRCK polarity - (Sony) format
-  {0x8652, 0x00000002, 0x00000000, 1, 0},	// Left-justified I2S (Phillips) format
+  {0x8652, 0x00000062, 0x00000000, 1, 0},	// Left-justified I2S (Phillips) format
 //  {0x8652, 0x00000000, 0x00000000, 1, 0},	// Right-justified (Sony) format
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
@@ -492,7 +492,7 @@ static const struct reg_value tc358743_setting_YUV422_4lane_1024x768_60fps_125MH
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -575,7 +575,7 @@ static const struct reg_value tc358743_setting_YUV422_4lane_1024x768_75fps_300MH
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -655,7 +655,7 @@ static const struct reg_value tc358743_setting_YUV422_4lane_720P_60fps_1280_720_
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -1159,7 +1159,7 @@ static const struct reg_value tc358743_setting_YUV422_2lane_60fps_640_480_125Mhz
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -1241,7 +1241,7 @@ static const struct reg_value tc358743_setting_YUV422_2lane_60fps_720_480_125Mhz
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -1322,7 +1322,7 @@ static const struct reg_value tc358743_setting_YUV422_4lane_1080P_60fps_1920_108
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},
@@ -1405,7 +1405,7 @@ static const struct reg_value tc358743_setting_YUV422_4lane_1080P_30fps_1920_108
   {0x8640, 0x00000001, 0x00000000, 1, 0},
   {0x8641, 0x00000065, 0x00000000, 1, 0},
   {0x8642, 0x00000007, 0x00000000, 1, 0},
-  {0x8652, 0x00000002, 0x00000000, 1, 0},
+  {0x8652, 0x00000062, 0x00000000, 1, 0},
   {0x8665, 0x00000010, 0x00000000, 1, 0},
 // InfoFrame Extraction
   {0x8709, 0x000000ff, 0x00000000, 1, 0},		// PACKET INTERRUPT MODE: all enable
@@ -2901,13 +2901,14 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 
 	pr_info("imxpac_tc358743_hw_params\n");
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_I2S |
-				SND_SOC_DAIFMT_NB_IF |
+				SND_SOC_DAIFMT_NB_NF |
 				SND_SOC_DAIFMT_CBM_CFM);
 	if (ret) {
 		pr_err("%s: failed set cpu dai format\n", __func__);
 		return ret;
 	}
 
+#if 0
 	pr_info("imxpac_tc358743_hw_params 1\n");
 
 	ret = snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S |
@@ -2929,7 +2930,7 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 
 	pr_info("imxpac_tc358743_hw_params 3\n");
 	snd_soc_dai_set_tdm_slot(cpu_dai, 0xffffffc, 0xffffffc, 2, 0);
-
+#endif
 	ret = snd_soc_dai_set_sysclk(cpu_dai, IMX_SSP_SYS_CLK, 0,
 				SND_SOC_CLOCK_IN);
 
@@ -2939,14 +2940,14 @@ static int imxpac_tc358743_hw_params(struct snd_pcm_substream *substream,
 	}
 	pr_info("imxpac_tc358743_hw_params 4\n");
 
-#if 1
+#if 0
 	// clear SSI_SRCR_RXBIT0 and SSI_SRCR_RSHFD in order to push Right-justified MSB data from
 	{
 		struct fsl_ssi_private *ssi_private = snd_soc_dai_get_drvdata(cpu_dai);
 		struct regmap *regs = ssi_private->regs;
 
-		regmap_update_bits(regs, CCSR_SSI_STCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(32));
-		regmap_update_bits(regs, CCSR_SSI_SRCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(32));
+		regmap_update_bits(regs, CCSR_SSI_STCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(16));
+		regmap_update_bits(regs, CCSR_SSI_SRCCR, CCSR_SSI_SxCCR_WL_MASK, CCSR_SSI_SxCCR_WL(16));
 	}
 #endif
 	pr_info("imxpac_tc358743_hw_params 5\n");
@@ -2996,7 +2997,11 @@ static int imx_audmux_config(int slave, int master)
 		IMX_AUDMUX_V2_PTCR_TFSDIR |
 		IMX_AUDMUX_V2_PTCR_TFSEL(master) |
 		IMX_AUDMUX_V2_PTCR_TCLKDIR |
-		IMX_AUDMUX_V2_PTCR_TCSEL(master);
+		IMX_AUDMUX_V2_PTCR_TCSEL(master) |
+		IMX_AUDMUX_V2_PTCR_RFSDIR |
+		IMX_AUDMUX_V2_PTCR_RFSEL(master) |
+		IMX_AUDMUX_V2_PTCR_RCLKDIR |
+		IMX_AUDMUX_V2_PTCR_RCSEL(master);
 	pdcr = IMX_AUDMUX_V2_PDCR_RXDSEL(master);
 	ret = imx_audmux_v2_configure_port(slave, ptcr, pdcr);
 	if (ret)
@@ -3146,9 +3151,8 @@ static struct snd_soc_codec_driver soc_codec_dev_tc358743 = {
 	.resume = tc358743_codec_resume,
 };
 
-#define AIC3X_RATES	SNDRV_PCM_RATE_8000_96000
-#define AIC3X_FORMATS	(SNDRV_PCM_FMTBIT_S16_LE | SNDRV_PCM_FMTBIT_S20_3LE | \
-			SNDRV_PCM_FMTBIT_S24_LE)
+#define AIC3X_RATES	SNDRV_PCM_RATE_44100
+#define AIC3X_FORMATS	(SNDRV_PCM_FMTBIT_S24_LE)
 
 static int tc358743_hw_params(struct snd_pcm_substream *substream,
 			   struct snd_pcm_hw_params *params,

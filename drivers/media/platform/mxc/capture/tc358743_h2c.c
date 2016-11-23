@@ -3151,7 +3151,7 @@ static struct snd_soc_codec_driver soc_codec_dev_tc358743 = {
 	.resume = tc358743_codec_resume,
 };
 
-#define AIC3X_RATES	SNDRV_PCM_RATE_44100
+#define AIC3X_RATES	SNDRV_PCM_RATE_8000_96000 
 #define AIC3X_FORMATS	(SNDRV_PCM_FMTBIT_S24_LE)
 
 static int tc358743_hw_params(struct snd_pcm_substream *substream,

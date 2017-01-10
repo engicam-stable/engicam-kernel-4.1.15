@@ -14,6 +14,13 @@
 / {
 	model = "Engicam i.CoreM6 Quad/Dual starterkit";
 	compatible = "fsl,imx6-icore", "fsl,imx6q";
+	
+	aliases {
+		mmc0 = &usdhc1;
+		mmc1 = &usdhc3;
+		mmc2 = &usdhc2;
+		mmc3 = &usdhc4;
+	};	
 };
 
 &ldb {

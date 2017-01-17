@@ -204,38 +204,53 @@ static void __init imx6q_enet_phy_init(void)
 
 #define ICORE_GPIO_EDIMM_VER 191 /* GPIO6_31 */
 
-static void __init icore_set_enet_clock(void)
+
+static void set_edimm_version(void)
 {
 	int icore_ver_gpio;
-	struct regmap *gpr;
-	
-	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
-	
 	icore_ver_gpio = ICORE_GPIO_EDIMM_VER;
-	
+
 	if (gpio_is_valid(icore_ver_gpio) &&
 	    !gpio_request_one(icore_ver_gpio, GPIOF_DIR_IN, "icore_ver_gpio"))
 	{
 		gpio_direction_input(icore_ver_gpio);
-	
+
 		if(!gpio_get_value(icore_ver_gpio))
 		{
 			edimm_ver = 15;
 			printk("i.Core M6 1.5 version\n");
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
-		}		
+		}
 		else
 		{
 			edimm_ver = 10;
 			printk("i.Core M6 standard 1.0 version\n");
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_PAD);
 		}
 		gpio_free(icore_ver_gpio);
 	}
+
+}
+
+static void __init icore_set_enet_clock(void)
+{
+	struct regmap *gpr;
+
+	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+
+	set_edimm_version();
+
+	if(edimm_ver == 15)
+	{
+		regmap_update_bits(gpr, IOMUXC_GPR1,
+				IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+				IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
+	}
+	else
+	{
+		regmap_update_bits(gpr, IOMUXC_GPR1,
+				IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+				IMX6Q_GPR1_ENET_CLK_SEL_PAD);
+	}
+
 }
 
 
@@ -244,7 +259,8 @@ static void __init imx6q_csi_mux_init(void)
 	struct regmap *gpr;
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
-
+	set_edimm_version();
+	printk("[ML]	 imx6q_csi_mux_init %d\n",edimm_ver);
 	if (!IS_ERR(gpr)) {
 		/*
 		 * MX6Q i.Core board:
@@ -263,7 +279,10 @@ static void __init imx6q_csi_mux_init(void)
 			if(cpu_is_imx6q())
 				regmap_update_bits(gpr, IOMUXC_GPR1, 3 << 19, 3 << 19);
 			else
-				regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x24);
+				if(edimm_ver == 15)
+					regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x20);
+				else
+					regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x24);
 		}
 
 		/*
@@ -483,17 +502,17 @@ static void __init icore_late_init(void)
 		if(gpio_get_value(icore_ver_gpio))
 		{
 			printk("i.Core revision C or older\n");
-			pctl = pinctrl_get_select(&pdev->dev, "rev_c"); 
+			pctl = pinctrl_get_select(&pdev->dev, "rev_c");
 			if (IS_ERR(pctl)) {
 				pr_err("%s: can't get pinctrl state\n", __func__);
 				goto put_node;
 			}
-		}		
+		}
 		else
 			printk("i.Core revision D or higher\n");
 	}
 	else
-		goto put_node;	
+		goto put_node;
 
 put_node:
 	of_node_put(np);

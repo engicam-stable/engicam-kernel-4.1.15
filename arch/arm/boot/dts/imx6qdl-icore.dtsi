@@ -279,7 +279,7 @@
 &can1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1_1>;
-	status = "okay"; 
+	status = "okay";
 };
 
 &can2 {
@@ -335,7 +335,7 @@
 &gpmi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
-	status = "okay"; 
+	status = "okay";
 	fsl,legacy-bch-geometry;
 	nand-on-flash-bbt;
 };

@@ -36,8 +36,8 @@
 		reg = <0x48>;
 		interrupt-parent = <&gpio3>;
 		interrupts = <31 2>;
-		work-mode = <0>;/*DCM mode*/		
-		pinctrl-names = "default";		
+		work-mode = <0>;/*DCM mode*/
+		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_max11801>;
 	};
 
@@ -87,10 +87,10 @@
 	  pinctrl_max11801:max11801 {
 			fsl,pins = <
 			    MX6QDL_PAD_EIM_D31__GPIO3_IO31 0x80000000 /* int for max11801 */
-			>;	    
+			>;
 	  };
 	};
-	
+
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <

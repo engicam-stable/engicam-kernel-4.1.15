@@ -240,3 +240,47 @@ Example 2:
 Here, three GPIO ranges are defined wrt. two pin controllers. pinctrl1 GPIO
 ranges are defined using pin numbers whereas the GPIO ranges wrt. pinctrl2
 are named "foo" and "bar".
+
+3) gpio-export
+--------------
+
+gpio-export will allow you to export a GPIO line to linux sysfs.
+Can be used to describe hw GPIO lines by "name" and to have them exported at
+boot-time to make it convenient for users.
+
+required properties:
+- compatible: Should be "linux,gpio-export"
+
+in each child node will represent a GPIO line
+
+equired properties:
+- gpios: GPIO line to export
+
+optional properties:
+ - label: export name, if not present, child node name used
+ - output: to set it as output with default value
+	   if not present gpio as input
+ - direction-may-change: boolean to allow the direction to be controllable
+
+Example:
+
+gpio_export {
+	compatible = "linux,gpio-export";
+
+	in {
+		label = "in";
+		gpios = <&pioC 20 0>;
+	};
+
+	out {
+		label = "out";
+		output = <1>;
+		direction-may-change;
+		gpios = <&pioC 21 0>;
+	};
+
+	in_out {
+		direction-may-change;
+		gpios = <&pioC 22 0>;
+	};
+};

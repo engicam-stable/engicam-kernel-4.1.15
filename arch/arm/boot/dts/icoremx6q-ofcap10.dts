@@ -1,0 +1,121 @@
+/*
+ * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "imx6q.dtsi"
+#include "imx6qdl-icore.dtsi"
+
+/ {
+	model = "Engicam i.CoreM6 Dual/Quad OpenFrame Cap 10.1";
+	compatible = "fsl,imx6-icore", "fsl,imx6q";
+
+	sound {
+		compatible = "fsl,imx6-icore-sgtl5000",
+			     "fsl,imx-audio-sgtl5000";
+		model = "imx6q-icore-sgtl5000";
+		cpu-dai = <&ssi1>;
+		audio-codec = <&codec>;
+		audio-routing =
+			"MIC_IN", "Mic Jack",
+			"Mic Jack", "Mic Bias",
+			"Headphone Jack", "HP_OUT";
+		mux-int-port = <1>;
+		mux-ext-port = <4>;
+	};
+	
+	gpio_export {
+		compatible = "gpio-export";
+		GPIO_EIM_DA7 {
+			gpio-export,name = "GPIO_EIM_DA7";
+			gpio-export,input = <1>;
+			gpios = <&gpio3 7 0>;
+		};		
+	};
+	
+};
+
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+		crtc = "ipu1-di0";
+		primary;
+
+		display-timings {
+                        native-mode = <&timing1>;
+                        timing1: hsd100pxn1 {
+                                clock-frequency = <60000000>;
+                                hactive = <1280>;
+                                vactive = <800>;
+                                hback-porch = <40>;
+                                hfront-porch = <40>;
+                                vback-porch = <10>;
+                                vfront-porch = <3>;
+                                hsync-len = <80>;
+                                vsync-len = <10>;
+                        };
+                };
+	};
+};
+
+
+&mxcfb1 {
+	status = "disabled";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&usbotg {
+	status = "disabled";
+};
+
+
+&i2c3 {
+
+	codec: sgtl5000@0a {
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks 201>;
+		VDDA-supply = <&reg_2p5v>;
+		VDDIO-supply = <&reg_3p3v>;
+		VDDD-supply = <&reg_1p8v>;
+	};
+	
+	pcf8563: rtc@51 {
+		compatible = "pcf8563";
+		reg = <0x51>;
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;	
+	hog {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX6QDL_PAD_EIM_DA7__GPIO3_IO07 0x1f059 /* EIM_DA07 forced to GPIO in */
+			>;
+		};
+	};
+};

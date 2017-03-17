@@ -264,6 +264,8 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-gw54xx.dtb \
 	imx6dl-gw552x.dtb \
 	imx6dl-hummingboard.dtb \
+	icoremx6dl-ofcap7.dtb \
+	icoremx6q-ofcap10.dtb \
 	icoremx6dl-starterkit.dtb \
 	icoremx6q-starterkit.dtb \
 	imx6dl-nitrogen6x.dtb \

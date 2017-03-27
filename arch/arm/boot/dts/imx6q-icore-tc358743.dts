@@ -132,6 +132,7 @@
 		AVDD-supply = <&reg_2p5v>;
 		DVDD-supply = <&reg_1p8v>;
 		rst-gpios = <&gpio6 5 GPIO_ACTIVE_LOW>;
+		irq-gpios = <&gpio6 4 GPIO_ACTIVE_HIGH>;
 		interrupts-extended = <&gpio6 4 IRQ_TYPE_LEVEL_LOW>;
 		ipu_id = <0>;
 		csi_id = <0>;

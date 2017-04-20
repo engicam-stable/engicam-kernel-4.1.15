@@ -345,6 +345,13 @@ static void disable_anatop_clocks(void)
 	writel_relaxed(reg, anatop_base + 0xa0);
 }
 
+void init_rqs_hub_usb(void)
+{
+       imx_clk_set_parent(clk[IMX6QDL_CLK_LVDS2_SEL], clk[IMX6QDL_CLK_OSC]);
+       imx_clk_prepare_enable(clk[IMX6QDL_CLK_LVDS2_GATE]);
+}
+
+
 static void __init imx6q_clocks_init(struct device_node *ccm_node)
 {
 	struct device_node *np;

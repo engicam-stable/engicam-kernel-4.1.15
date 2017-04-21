@@ -36,24 +36,22 @@
 };
 
 &sata {
-	status = "okay";
+        fsl,transmit-level-mV = <1025>;
+        fsl,transmit-boost-mdB = <3330>;
+        fsl,transmit-atten-16ths = <9>;
+        fsl,receive-eq-mdB = <3000>;
+        status = "okay";
 };
 
-/* To be enabled for PCI peripheral.
-   Please enable also the PCI support kernel options:
-   CONFIG_PCI and PCI_IMX6
-
-   i.Core RQS rev. B needed for PCIe
 
 &pcie {
 	power-on-gpio = <&gpio3 19 0>;
 	reset-gpio = <&gpio3 29 0>;
 	status = "okay";
 };
-*/
 
 &i2c1 {
-
+ 
 	lm75a@4F {
 		compatible = "lm75a";
 		reg = <0x4F>;
@@ -86,12 +84,10 @@
 
 &iomuxc {
 
-// TBD	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
-	
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
+				MX6QDL_PAD_SD2_DAT0__GPIO1_IO15 0x1f059
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
 			>;
 		};

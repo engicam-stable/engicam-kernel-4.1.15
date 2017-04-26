@@ -24,6 +24,17 @@
 		reg = <0x80000000 0x20000000>;
 	};
 
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		GPIO_DL2 {
+		        gpio-export,name = "GPIO_DL2";
+			gpio-export,output = <1>;
+                        gpio-export,direction_may_change;
+		        gpios = <&gpio4 16 0>;
+		};
+	};
+
 	backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm8 0 100000>;
@@ -243,7 +254,6 @@
 	xnur-gpio = <&gpio1 3 0>;
 	measure_delay_time = <0x1ffff>;
 	pre_charge_time = <0xfff>;
-	status = "okay";
 };
 
 &uart1 {
@@ -255,10 +265,6 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	//fsl,uart-has-rtscts;
-	/* for DTE mode, add below change */
-	/* fsl,dte-mode; */
-	/* pinctrl-0 = <&pinctrl_uart2dte>; */
 	status = "okay";
 };
 
@@ -294,12 +300,12 @@
 &usdhc2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-assert-gpios = <&gpio4 14 GPIO_ACTIVE_HIGH>;
 	no-1-8-v;
 	vmmc-supply = <&reg_out_3v3>;
 	keep-power-in-suspend;
 	non-removable;
 	status = "okay";
-	reset-gpios = <&gpio4 14 1>;	// WF111 reset on GEA M6UL starterkit
 };
 
 &i2c1 {
@@ -335,6 +341,7 @@
 			fsl,pins = <
 				MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x17059 /* WF111 reset */
 				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
+				MX6UL_PAD_NAND_DQS__GPIO4_IO16 0x17059 /*LED DL2*/
 			>;
 		};
 

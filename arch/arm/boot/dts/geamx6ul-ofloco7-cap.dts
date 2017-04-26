@@ -13,7 +13,7 @@
 #include "imx6ul.dtsi"
 
 / {
-	model = "Engicam LOCO 7 CAP open frame";
+	model = "Freescale i.MX6 UltraLite LOCO 7 Capacitive open frame";
 	compatible = "fsl,imx6ul-evk", "fsl,imx6ul";
 
 	chosen {
@@ -22,6 +22,17 @@
 
 	memory {
 		reg = <0x80000000 0x20000000>;
+	};
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		GPIO_DL2 {
+		        gpio-export,name = "GPIO_DL2";
+			gpio-export,output = <1>;
+                        gpio-export,direction_may_change;
+		        gpios = <&gpio4 16 0>;
+		};
 	};
 
 	backlight {
@@ -144,14 +155,14 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	xceiver-supply = <&reg_out_3v3>;
-	status = "okay";
+	status = "disabled";
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_out_3v3>;
-	status = "okay";
+	status = "disabled";
 };
 
 &gpc {
@@ -181,14 +192,7 @@
 	display0: display {
 		bits-per-pixel = <16>;
 		bus-width = <18>;
-#define AMPIRE
-#ifdef AMPIRE
-/*	Da togliere
-	 "Amp-WD" , 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
-	 FB_SYNC_CLK_LAT_FALL,
-	 FB_VMODE_NONINTERLACED,
-	 0,},
-*/
+
 		display-timings {
 			native-mode = <&timing0>;
 			timing0: timing0 {
@@ -208,36 +212,8 @@
 			pixelclk-active = <0>;
 			};
 		};
-#else
-/*	Da togliere
-	 "URT-WVGA", 60, 800, 480, 30000, 30, 30, 5, 5, 64, 20,
-	 FB_SYNC_CLK_IDLE_EN,
-	 FB_VMODE_NONINTERLACED,
-	 0,},
-*/
-		display-timings {
-			native-mode = <&timing0>;
-			timing0: timing0 {
-			clock-frequency = <28000000>;
-			hactive = <800>;
-			vactive = <480>;
-			hfront-porch = <30>;
-			hback-porch = <30>;
-			hsync-len = <64>;
-			vback-porch = <5>;
-			vfront-porch = <5>;
-			vsync-len = <20>;
-
-			hsync-active = <0>;
-			vsync-active = <0>;
-			de-active = <1>;
-			pixelclk-active = <1>;
-			};
-		};
-#endif
 	};
 };
-
 
 &pwm8 {
 	pinctrl-names = "default";
@@ -253,13 +229,13 @@
 &sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai2>;
-	status = "okay";
+	status = "disabled";
 };
 
 &tsc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_tsc>;
-	status = "okay";
+	status = "disabled";
 	xnur-gpio = <&gpio1 3 0>;
 	measure_delay_time = <0x1ffff>;
 	pre_charge_time = <0x1fff>;
@@ -274,14 +250,9 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	//fsl,uart-has-rtscts;
-	/* for DTE mode, add below change */
-	/* fsl,dte-mode; */
-	/* pinctrl-0 = <&pinctrl_uart2dte>; */
 	status = "okay";
 };
 
-/* rs485 */
 &uart8 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart8>;	
@@ -289,10 +260,9 @@
 	status = "okay";
 };
 
-
 &usbotg1 {
 	dr_mode = "peripheral";
-	status = "okay";
+	status = "disabled";
 };
 
 &usbotg2 {
@@ -301,13 +271,10 @@
 };
 
 &usdhc1 {
-//	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
-//	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-//	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
 	max-frequency = <50000000>;
-	cd-gpios = <&gpio1 19 0>;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
 	bus-width = <4>;
 	keep-power-in-suspend;
 	enable-sdio-wakeup;
@@ -320,8 +287,7 @@
 	no-1-8-v;
 	keep-power-in-suspend;
 	non-removable;
-	status = "okay";
-	reset-gpios = <&gpio4 14 1>;	// WF111 reset on GEA M6UL starterkit
+	status = "disabled";
 };
 
 &i2c1 {
@@ -341,6 +307,10 @@
 		reset-gpios = <&gpio4 18 1>;
 	};
 
+	pcf8563: rtc@51 {
+  		compatible = "pcf8563";
+  		reg = <0x51>;
+ 	};
 };
 
 &i2c2 {
@@ -368,7 +338,6 @@
 	imx6ul-evk {
 		pinctrl_hog_1: hoggrp-1 {
 			fsl,pins = <
-				MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x17059 /* WF111 reset */
 				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 			>;
 		};

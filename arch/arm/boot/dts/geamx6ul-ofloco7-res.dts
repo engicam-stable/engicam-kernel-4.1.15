@@ -13,7 +13,7 @@
 #include "imx6ul.dtsi"
 
 / {
-	model = "Engicam LOCO 7 open frame";
+	model = "Freescale i.MX6 UltraLite LOCO 7 Resistive open frame";
 	compatible = "fsl,imx6ul-evk", "fsl,imx6ul";
 
 	chosen {
@@ -22,6 +22,17 @@
 
 	memory {
 		reg = <0x80000000 0x20000000>;
+	};
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		GPIO_DL2 {
+		        gpio-export,name = "GPIO_DL2";
+			gpio-export,output = <1>;
+                        gpio-export,direction_may_change;
+		        gpios = <&gpio4 16 0>;
+		};
 	};
 
 	backlight {
@@ -219,7 +230,7 @@
 &sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai2>;
-	status = "okay";
+	status = "disabled";
 };
 
 &tsc {
@@ -240,17 +251,19 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	//fsl,uart-has-rtscts;
-	/* for DTE mode, add below change */
-	/* fsl,dte-mode; */
-	/* pinctrl-0 = <&pinctrl_uart2dte>; */
 	status = "okay";
 };
 
+&uart8 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart8>;	
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
 
 &usbotg1 {
 	dr_mode = "peripheral";
-	status = "okay";
+	status = "disabled";
 };
 
 &usbotg2 {
@@ -259,13 +272,10 @@
 };
 
 &usdhc1 {
-//	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
-//	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-//	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
 	max-frequency = <50000000>;
-	cd-gpios = <&gpio1 19 0>;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
 	bus-width = <4>;
 	keep-power-in-suspend;
 	enable-sdio-wakeup;
@@ -278,8 +288,7 @@
 	no-1-8-v;
 	keep-power-in-suspend;
 	non-removable;
-	status = "okay";
-	reset-gpios = <&gpio4 14 1>;	// WF111 reset on GEA M6UL starterkit
+	status = "disabled";
 };
 
 &i2c1 {
@@ -287,6 +296,11 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
+
+	pcf8563: rtc@51 {
+  		compatible = "pcf8563";
+  		reg = <0x51>;
+ 	};
 };
 
 &i2c2 {
@@ -303,8 +317,8 @@
 	imx6ul-evk {
 		pinctrl_hog_1: hoggrp-1 {
 			fsl,pins = <
-				MX6UL_PAD_NAND_CE1_B__GPIO4_IO14	0x17059 /* WF111 reset */
 				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
+				MX6UL_PAD_NAND_DQS__GPIO4_IO16 0x17059 /*LED DL2*/
 			>;
 		};
 
@@ -431,6 +445,14 @@
 				MX6UL_PAD_UART2_RX_DATA__UART2_DTE_TX	0x1b0b1
 				MX6UL_PAD_UART3_RX_DATA__UART2_DTE_CTS	0x1b0b1
 				MX6UL_PAD_UART3_TX_DATA__UART2_DTE_RTS	0x1b0b1
+			>;
+		};
+
+		pinctrl_uart8: uart8grp {
+			fsl,pins = <
+				MX6UL_PAD_LCD_DATA20__UART8_DCE_TX	0x1b0b1
+				MX6UL_PAD_LCD_DATA21__UART8_DCE_RX	0x1b0b1
+				MX6UL_PAD_ENET2_TX_CLK__UART8_DCE_CTS	0x1b0b0
 			>;
 		};
 

@@ -8,12 +8,11 @@
 
 /dts-v1/;
 
-#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include "imx6ul.dtsi"
 
 / {
-	model = "Freescale i.MX6 UltraLite EVK Board";
+	model = "Freescale i.MX6 UltraLite LOCO 4.3 open frame";
 	compatible = "fsl,imx6ul-evk", "fsl,imx6ul";
 
 	chosen {
@@ -79,21 +78,6 @@
 			regulator-max-microvolt = <1800000>;
 		};
 
-	};
-
-	sound {
-		compatible = "fsl,imx6q-icore-sgtl5000",
-			     "fsl,imx-audio-sgtl5000";
-		model = "imx6q-icore-sgtl5000";
-		cpu-dai = <&sai2>;
-		audio-codec = <&codec>;
-		asrc-controller = <&asrc>;
-		codec-master;
-		gpr = <&gpr>;
-		audio-routing =
-			"MIC_IN", "Mic Jack",
-			"Mic Jack", "Mic Bias",
-			"Headphone Jack", "HP_OUT";
 	};
 
 	spi4 {
@@ -169,14 +153,14 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
 	xceiver-supply = <&reg_out_3v3>;
-	status = "okay";
+	status = "disabled";
 };
 
 &flexcan2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_out_3v3>;
-	status = "okay";
+	status = "disabled";
 };
 
 &gpc {
@@ -186,6 +170,14 @@
 	fsl,cpu_pdnscr_iso = <0x1>;
 	fsl,wdog-reset = <1>; /* watchdog select of reset source */
 	fsl,ldo-bypass = <1>; /* use ldo-bypass, u-boot will check it and configure */
+};
+
+&gpmi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpmi_nand_1>;
+	status = "okay";
+	fsl,legacy-bch-geometry;
+	nand-on-flash-bbt;
 };
 
 &lcdif {
@@ -198,19 +190,20 @@
 	display0: display {
 		bits-per-pixel = <16>;
 		bus-width = <18>;
+ 	
 
 		display-timings {
 			native-mode = <&timing0>;
 			timing0: timing0 {
-			clock-frequency = <28000000>;
-			hactive = <800>;
-			vactive = <480>;
-			hfront-porch = <30>;
-			hback-porch = <30>;
-			hsync-len = <64>;
-			vback-porch = <5>;
-			vfront-porch = <5>;
-			vsync-len = <20>;
+			clock-frequency = <10000000>;
+			hactive = <480>;
+			vactive = <272>;
+			hfront-porch = <8>;
+			hback-porch = <2>;
+			hsync-len = <35>;
+			vback-porch = <11>;
+			vfront-porch = <2>;
+			vsync-len = <2>;
 
 			hsync-active = <0>;
 			vsync-active = <0>;
@@ -220,7 +213,6 @@
 		};
 	};
 };
-
 
 &pwm8 {
 	pinctrl-names = "default";
@@ -236,7 +228,7 @@
 &sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai2>;
-	status = "okay";
+	status = "disabled";
 };
 
 &tsc {
@@ -267,10 +259,10 @@
 	status = "okay";
 };
 
+
 &usbotg1 {
-	pinctrl-names = "default";
 	dr_mode = "peripheral";
-	status = "okay";
+	status = "disabled";
 };
 
 &usbotg2 {
@@ -282,10 +274,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
 	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
-	vmmc-supply = <&reg_out_3v3>;
 	bus-width = <4>;
-	enable-sdio-wakeup;
 	keep-power-in-suspend;
+	enable-sdio-wakeup;
 	status = "okay";
 };
 
@@ -293,10 +284,9 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	no-1-8-v;
-	vmmc-supply = <&reg_out_3v3>;
 	keep-power-in-suspend;
 	non-removable;
-	status = "okay";
+	status = "disabled";
 };
 
 &i2c1 {
@@ -305,16 +295,10 @@
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
-	codec: sgtl5000@0a {
-		compatible = "fsl,sgtl5000";
-		reg = <0x0a>;
-		clocks = <&clks IMX6UL_CLK_OSC>;
-		clock-names = "mclk";
-		wlf,shared-lrclk;
-		VDDA-supply = <&reg_out_3v3>;
-		VDDIO-supply = <&reg_out_3v3>;
-		VDDD-supply = <&reg_out_1v8>;
-	};
+	pcf8563: rtc@51 {
+  		compatible = "pcf8563";
+  		reg = <0x51>;
+ 	};
 };
 
 &i2c2 {
@@ -324,6 +308,7 @@
 	status = "okay";
 };
 
+
 &iomuxc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hog_1>;
@@ -332,13 +317,6 @@
 			fsl,pins = <
 				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 				MX6UL_PAD_NAND_DQS__GPIO4_IO16 0x17059 /*LED DL2*/
-				/* SD2 pin as GPIO when eMMC is mounetd */
-				MX6UL_PAD_CSI_VSYNC__GPIO4_IO19 	0x17059
-				MX6UL_PAD_CSI_HSYNC__GPIO4_IO20		0x17059				
-				MX6UL_PAD_CSI_DATA00__GPIO4_IO21	0x17059
-				MX6UL_PAD_CSI_DATA01__GPIO4_IO22	0x17059
-				MX6UL_PAD_CSI_DATA02__GPIO4_IO23	0x17059
-				MX6UL_PAD_CSI_DATA03__GPIO4_IO24	0x17059
 			>;
 		};
 
@@ -365,7 +343,6 @@
 				MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN	0x1b0b0
 				MX6UL_PAD_ENET2_TX_DATA0__ENET2_TDATA00	0x1b0b0
 				MX6UL_PAD_ENET2_TX_DATA1__ENET2_TDATA01	0x1b0b0
-				MX6UL_PAD_GPIO1_IO05__ENET2_REF_CLK2	0x4001b031
 			>;
 		};
 
@@ -456,7 +433,7 @@
 				MX6UL_PAD_UART2_TX_DATA__UART2_DCE_TX	0x1b0b1
 				MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX	0x1b0b1
 				MX6UL_PAD_UART3_RX_DATA__UART2_DCE_RTS	0x1b0b1
-				//MX6UL_PAD_UART3_TX_DATA__UART2_DCE_CTS	0x1b0b1
+				MX6UL_PAD_UART3_TX_DATA__UART2_DCE_CTS	0x1b0b1
 			>;
 		};
 
@@ -467,13 +444,13 @@
 				MX6UL_PAD_ENET2_TX_CLK__UART8_DCE_CTS	0x1b0b0
 			>;
 		};
-		
+
 		pinctrl_uart2dte: uart2dtegrp {
 			fsl,pins = <
 				MX6UL_PAD_UART2_TX_DATA__UART2_DTE_RX	0x1b0b1
 				MX6UL_PAD_UART2_RX_DATA__UART2_DTE_TX	0x1b0b1
 				MX6UL_PAD_UART3_RX_DATA__UART2_DTE_CTS	0x1b0b1
-				//MX6UL_PAD_UART3_TX_DATA__UART2_DTE_RTS	0x1b0b1
+				MX6UL_PAD_UART3_TX_DATA__UART2_DTE_RTS	0x1b0b1
 			>;
 		};
 
@@ -485,7 +462,6 @@
 				MX6UL_PAD_SD1_DATA1__USDHC1_DATA1 0x17059
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2 0x17059
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3 0x17059
-				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 			>;
 		};
 
@@ -497,7 +473,6 @@
 				MX6UL_PAD_SD1_DATA1__USDHC1_DATA1 0x170b9
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2 0x170b9
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3 0x170b9
-				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 			>;
 		};
 
@@ -509,23 +484,17 @@
 				MX6UL_PAD_SD1_DATA1__USDHC1_DATA1 0x170f9
 				MX6UL_PAD_SD1_DATA2__USDHC1_DATA2 0x170f9
 				MX6UL_PAD_SD1_DATA3__USDHC1_DATA3 0x170f9
-				MX6UL_PAD_UART1_RTS_B__GPIO1_IO19  0x17059 /*CD sdhc1 */
 			>;
 		};
 
 		pinctrl_usdhc2: usdhc2grp {
 			fsl,pins = <
-				MX6UL_PAD_NAND_RE_B__USDHC2_CLK     0x17070
-				MX6UL_PAD_NAND_WE_B__USDHC2_CMD     0x10070
-				MX6UL_PAD_NAND_DATA00__USDHC2_DATA0  0x17070
-				MX6UL_PAD_NAND_DATA01__USDHC2_DATA1  0x17070
-				MX6UL_PAD_NAND_DATA02__USDHC2_DATA2  0x17070
-				MX6UL_PAD_NAND_DATA03__USDHC2_DATA3  0x17070
-				MX6UL_PAD_NAND_DATA04__USDHC2_DATA4  0x17070
-				MX6UL_PAD_NAND_DATA05__USDHC2_DATA5  0x17070
-				MX6UL_PAD_NAND_DATA06__USDHC2_DATA6  0x17070
-				MX6UL_PAD_NAND_DATA07__USDHC2_DATA7  0x17070
-				MX6UL_PAD_NAND_ALE__USDHC2_RESET_B   0x17070
+				MX6UL_PAD_CSI_VSYNC__USDHC2_CLK     0x17070
+				MX6UL_PAD_CSI_HSYNC__USDHC2_CMD     0x10070
+				MX6UL_PAD_CSI_DATA00__USDHC2_DATA0  0x17070
+				MX6UL_PAD_CSI_DATA01__USDHC2_DATA1  0x17070
+				MX6UL_PAD_CSI_DATA02__USDHC2_DATA2  0x17070
+				MX6UL_PAD_CSI_DATA03__USDHC2_DATA3  0x17070
 			>;
 		};
 

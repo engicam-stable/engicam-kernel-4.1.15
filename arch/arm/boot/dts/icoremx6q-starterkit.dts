@@ -14,6 +14,23 @@
 / {
 	model = "Engicam i.CoreM6 Quad/Dual starterkit";
 	compatible = "fsl,imx6-icore", "fsl,imx6q";
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		GPIO_DL2 {
+		        gpio-export,name = "GPIO_DL2";
+			gpio-export,output = <1>;
+                        gpio-export,direction_may_change;
+		        gpios = <&gpio1 3 0>;
+		};
+		
+		GPIO_EIM_DA7 {
+			gpio-export,name = "GPIO_EIM_DA7";
+			gpio-export,input = <1>;
+			gpios = <&gpio3 7 0>;
+		};				
+	};
 };
 
 &ldb {
@@ -29,8 +46,45 @@
 	status = "okay";
 };
 
-&i2c1 {
+&can1 {
+	status = "okay"; 
+};
 
+&can2 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	status = "okay";
+};
+
+&uart4 {
+	status = "okay";
+};
+
+&usbotg {
+	status = "okay";
+};
+
+&usdhc1 {
+	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+&sata {
+	status = "okay";
+};
+
+&i2c1 {
 	max11801@48 {
 		compatible = "maxim,max11801";
 		reg = <0x48>;
@@ -44,7 +98,6 @@
 };
 
 &i2c2 {
-
 	hdmi: edid@50 {
 		compatible = "fsl,imx6-hdmi-i2c";
 		reg = <0x50>;
@@ -53,7 +106,6 @@
 
 
 &i2c3 {
-
 	codec: sgtl5000@0a {
 		compatible = "fsl,sgtl5000";
 		reg = <0x0a>;
@@ -74,18 +126,13 @@
 		AVDD-supply = <&reg_3p3v>;  /* 1.8v */
 		DVDD-supply = <&reg_3p3v>;  /* 1.8v */
 		PVDD-supply = <&reg_3p3v>;  /* 1.8v */
+		pwn-gpios = <&gpio3 19 0>;
 		csi_id = <0>;
 		mclk = <24000000>;
 		mclk_source = <0>;
 		cvbs = <1>;
 	};
 };
-
-&sata {
-	status = "okay";
-};
-
-
 
 &iomuxc {
 	touchpanel{
@@ -99,8 +146,11 @@
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
+				MX6QDL_PAD_GPIO_2__GPIO1_IO02  0x1f059 /* WF111 reset */
+				MX6QDL_PAD_GPIO_3__GPIO1_IO03  0x1f059 /* LED DL2*/
 				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
+				MX6QDL_PAD_EIM_DA7__GPIO3_IO07 0x1f059 /* EIM_DA07 forced to GPIO in */
+				MX6QDL_PAD_GPIO_1__GPIO1_IO01  0x1f059 /*CD SD CARD*/
 			>;
 		};
 	};

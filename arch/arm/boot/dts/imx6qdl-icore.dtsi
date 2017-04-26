@@ -104,8 +104,6 @@
 			regulator-name = "usb_h1_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-//			gpio = <&max7310_b 7 GPIO_ACTIVE_HIGH>;
-//			enable-active-high;
 			regulator-always-on;
 		};
 
@@ -114,8 +112,6 @@
 			regulator-name = "usb_otg_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-//			gpio = <&max7310_c 1 GPIO_ACTIVE_HIGH>;
-//			enable-active-high;
 			regulator-always-on;
 		};
 
@@ -259,7 +255,6 @@
 &i2c3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c3_4>;
-//	pinctrl-assert-gpios = <&gpio5 4 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 };
 
@@ -279,13 +274,13 @@
 &can1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1_1>;
-	status = "okay"; 
+	status = "disabled"; 
 };
 
 &can2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2_1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &ldb {
@@ -299,7 +294,7 @@
 };
 
 &pcie {
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm3 {
@@ -316,20 +311,20 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2_1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3_2>;
 	fsl,uart-has-rtscts;
-	status = "okay";
+	status = "disabled";
 };
 
 &uart4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart4_1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &gpmi {
@@ -348,21 +343,17 @@
 
 &usbotg {
 	vbus-supply = <&reg_usb_otg_vbus>;
-	pinctrl-names = "default", "rev_c";
-	pinctrl-0 = <&pinctrl_usbotg_2>;
-	pinctrl-1 = <&pinctrl_usbotg_3>;
+	pinctrl-names = "default";
 	disable-over-current;
-	ver-gpios = <&gpio7 2 0>;
 	dr_mode="otg";
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1_2>;
-	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
 	no-1-8-v;
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc2 {
@@ -370,7 +361,7 @@
 	pinctrl-0 = <&pinctrl_usdhc2_2>;
 	no-1-8-v;
 	non-removable;
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc3 {
@@ -378,7 +369,7 @@
 	pinctrl-0 = <&pinctrl_usdhc3_1>;
 	no-1-8-v;
 	non-removable;
-	status = "okay";
+	status = "disabled";
 };
 
 &iomuxc {
@@ -966,18 +957,6 @@
 		pinctrl_usbotg_1: usbotggrp-1 {
 			fsl,pins = <
 				MX6QDL_PAD_GPIO_1__USB_OTG_ID 0x17059
-			>;
-		};
-
-		pinctrl_usbotg_2: usbotggrp-2 {
-			fsl,pins = <
-				MX6QDL_PAD_ENET_RX_ER__USB_OTG_ID 0x17059
-			>;
-		};
-
-		pinctrl_usbotg_3: usbotggrp-3 {
-			fsl,pins = <
-				MX6QDL_PAD_ENET_RX_ER__ENET_RX_ER	0x1b0b0
 			>;
 		};
 	};

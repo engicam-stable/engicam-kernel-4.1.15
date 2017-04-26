@@ -8,11 +8,12 @@
 
 /dts-v1/;
 
+#include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
 #include "imx6ul.dtsi"
 
 / {
-	model = "Freescale i.MX6 UltraLite EVK Board";
+	model = "Freescale i.MX6 UltraLite C.TOUCH.Wi open frame";
 	compatible = "fsl,imx6ul-evk", "fsl,imx6ul";
 
 	chosen {
@@ -67,21 +68,6 @@
 			regulator-max-microvolt = <1800000>;
 		};
 
-	};
-
-	sound {
-		compatible = "fsl,imx6q-icore-sgtl5000",
-			     "fsl,imx-audio-sgtl5000";
-		model = "imx6q-icore-sgtl5000";
-		cpu-dai = <&sai2>;
-		audio-codec = <&codec>;
-		asrc-controller = <&asrc>;
-		codec-master;
-		gpr = <&gpr>;
-		audio-routing =
-			"MIC_IN", "Mic Jack",
-			"Mic Jack", "Mic Bias",
-			"Headphone Jack", "HP_OUT";
 	};
 
 	spi4 {
@@ -218,6 +204,7 @@
 	};
 };
 
+
 &pwm8 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm8>;
@@ -232,16 +219,16 @@
 &sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai2>;
-	status = "okay";
+	status = "disabled";
 };
 
 &tsc {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_tsc>;
-	status = "okay";
+	status = "disabled";
 	xnur-gpio = <&gpio1 3 0>;
 	measure_delay_time = <0x1ffff>;
-	pre_charge_time = <0x1fff>;
+	pre_charge_time = <0xfff>;
 };
 
 &uart1 {
@@ -253,13 +240,15 @@
 &uart2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
-	//fsl,uart-has-rtscts;
-	/* for DTE mode, add below change */
-	/* fsl,dte-mode; */
-	/* pinctrl-0 = <&pinctrl_uart2dte>; */
 	status = "okay";
 };
 
+&uart8 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart8>;	
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
 
 &usbotg1 {
 	dr_mode = "peripheral";
@@ -272,26 +261,26 @@
 };
 
 &usdhc1 {
-//	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc1>;
-//	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-//	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
-	cd-gpios = <&gpio1 19 0>;
+	cd-gpios = <&gpio1 19 GPIO_ACTIVE_LOW>;
+	vmmc-supply = <&reg_out_3v3>;
 	bus-width = <4>;
-	keep-power-in-suspend;
 	enable-sdio-wakeup;
+	keep-power-in-suspend;
 	status = "okay";
 };
+
 
 &usdhc2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-assert-gpios = <&gpio4 14 GPIO_ACTIVE_HIGH>;
 	no-1-8-v;
+	vmmc-supply = <&reg_out_3v3>;
 	keep-power-in-suspend;
 	non-removable;
 	status = "okay";
-	reset-gpios = <&gpio4 14 1>;	// WF111 reset on GEA M6UL starterkit
 };
 
 &i2c1 {
@@ -300,18 +289,7 @@
 	pinctrl-0 = <&pinctrl_i2c1>;
 	status = "okay";
 
-	codec: sgtl5000@0a {
-		compatible = "fsl,sgtl5000";
-		reg = <0x0a>;
-		clocks = <&clks IMX6UL_CLK_OSC>;
-		clock-names = "mclk";
-		wlf,shared-lrclk;
-		VDDA-supply = <&reg_out_3v3>;
-		VDDIO-supply = <&reg_out_3v3>;
-		VDDD-supply = <&reg_out_1v8>;
-	};
-
-	/* for C.TOUCH.Wi 7" only */
+	/* for C.TOUCH.Wi 4.3" only */
 	polytouch: st1232_ts@55 {
 		compatible = "sitronix,st1232-ts";
 		reg = <0x55>;
@@ -321,7 +299,6 @@
 		interrupts = <0 0>;	
 		reset-gpios = <&gpio4 18 1>;
 	};
-
 };
 
 &i2c2 {
@@ -341,7 +318,6 @@
 		};
 	};
 };
-
 
 &iomuxc {
 	pinctrl-names = "default";
@@ -377,6 +353,7 @@
 				MX6UL_PAD_ENET2_TX_EN__ENET2_TX_EN	0x1b0b0
 				MX6UL_PAD_ENET2_TX_DATA0__ENET2_TDATA00	0x1b0b0
 				MX6UL_PAD_ENET2_TX_DATA1__ENET2_TDATA01	0x1b0b0
+				MX6UL_PAD_GPIO1_IO05__ENET2_REF_CLK2	0x4001b031
 			>;
 		};
 
@@ -468,6 +445,14 @@
 				MX6UL_PAD_UART2_RX_DATA__UART2_DCE_RX	0x1b0b1
 				MX6UL_PAD_UART3_RX_DATA__UART2_DCE_RTS	0x1b0b1
 				MX6UL_PAD_UART3_TX_DATA__UART2_DCE_CTS	0x1b0b1
+			>;
+		};
+
+		pinctrl_uart8: uart8grp {
+				fsl,pins = <
+				MX6UL_PAD_LCD_DATA20__UART8_DCE_TX	0x1b0b1
+				MX6UL_PAD_LCD_DATA21__UART8_DCE_RX	0x1b0b1
+				MX6UL_PAD_ENET2_TX_CLK__UART8_DCE_CTS	0x1b0b0
 			>;
 		};
 

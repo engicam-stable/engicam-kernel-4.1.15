@@ -1,0 +1,140 @@
+/*
+ * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "imx6q.dtsi"
+#include "imx6qdl-icore.dtsi"
+
+/ {
+	model = "Engicam i.CoreM6 Dual/Quad Capacitive open frame";
+	compatible = "fsl,imx6-icore", "fsl,imx6q";
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		
+		GPIO_EIM_DA7 {
+			gpio-export,name = "GPIO_EIM_DA7";
+			gpio-export,input = <1>;
+			gpios = <&gpio3 7 0>;
+		};				
+	};
+};
+
+&ldb {
+	status = "okay";
+
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <18>;
+		status = "okay";
+		crtc = "ipu1-di0";
+		primary;
+
+		display-timings {
+                        native-mode = <&timing1>;
+                        timing1: hsd100pxn1 {
+                                clock-frequency = <51000000>;
+                                hactive = <1024>;
+                                vactive = <600>;
+                                hback-porch = <30>;
+                                hfront-porch = <30>;
+                                vback-porch = <5>;
+                                vfront-porch = <5>;
+                                hsync-len = <64>;
+                                vsync-len = <20>;
+                        };
+                };
+	};
+};
+
+&mxcfb1 {
+	interface_pix_fmt = "RGB666";
+	default_bpp = <16>;
+	mode_str ="Amp-WD";
+	status = "okay";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+&can2 {
+	status = "okay";
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&uart3 {
+	status = "okay";
+};
+
+&uart4 {
+	status = "okay";
+};
+
+&usbotg {
+	status = "okay";
+};
+
+&usdhc1 {
+	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&i2c3 {
+	codec: sgtl5000@0a {
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks 201>;
+		VDDA-supply = <&reg_2p5v>;
+		VDDIO-supply = <&reg_3p3v>;
+		VDDD-supply = <&reg_1p8v>;
+	};
+
+	/* for cover touch 10.1 only */
+	polytouch: edt-ft5x06@38 {
+		compatible = "edt,edt-cover-ft5626";
+		reg = <0x38>;
+		pinctrl-names = "default";		
+		pinctrl-0 = <&pinctrl_edt_ft5x06>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <30 0>;	
+		pinctrl-assert-gpios = <&gpio1 7 GPIO_ACTIVE_LOW>;
+	};
+	
+	pcf8563: rtc@51 {
+		compatible = "pcf8563";
+		reg = <0x51>;
+	};
+};
+
+&iomuxc {
+	touchpanel{
+		pinctrl_edt_ft5x06:  edt-ft5x06grp  {
+			fsl,pins = <
+				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1b0b0 /*interrupt*/ 
+				MX6QDL_PAD_GPIO_7__GPIO1_IO07 0x1b0b0 /*reset edt*/
+			>;
+		};
+	};
+};
+
+&iomuxc {
+	hog {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX6QDL_PAD_EIM_DA7__GPIO3_IO07 0x1f059 /* EIM_DA07 forced to GPIO in */
+				MX6QDL_PAD_GPIO_1__GPIO1_IO01  0x1f059 /*CD SD CARD*/
+			>;
+		};
+	};
+};

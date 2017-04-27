@@ -268,6 +268,14 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	icoremx6q-starterkit.dtb \
 	icoremx6dl-ofres.dtb \
 	icoremx6q-ofres.dtb \
+	icoremx6dl-ofcap7.dtb \
+	icoremx6q-ofcap7.dtb \
+	icoremx6dl-ofcap10.dtb \
+	icoremx6q-ofcap10.dtb \
+	icoremx6dl-ofcover10.dtb \
+	icoremx6q-ofcover10.dtb \
+	icoremx6dl-ofcap15.dtb \
+	icoremx6q-ofcap15.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
 	imx6dl-rex-basic.dtb \

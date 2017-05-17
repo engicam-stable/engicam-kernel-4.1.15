@@ -25,6 +25,7 @@
 &ldb {
 	ipu_id = <0>;
 	sec_ipu_id = <0>;
+	status = "okay";
 };
 
 &mxcfb1 {
@@ -35,27 +36,59 @@
 	status = "okay";
 };
 
-&i2c1 {
-
-	lm75a@4F {
-		compatible = "lm75a";
-		reg = <0x4F>;
-	};
-
+&can1 {
+	status = "okay"; 
 };
 
-&i2c2 {
+&can2 {
+	status = "disabled";
+};
 
+&pcie {
+	status = "okay";
+};
+
+&pwm1 {
+	status = "okay";
+};
+
+&pwm2 {
+	status = "okay";
+};
+
+&ssi1 {
+	status = "okay";
+};
+
+&usbotg {
+	status = "okay";
+};
+
+&usdhc1 {
+	pinctrl-assert-gpios = <&gpio5 0 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+&usdhc3 {
+	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+
+&usdhc4 {
+	status = "okay";
+};
+
+
+&i2c2 {
 	hdmi: edid@50 {
 		compatible = "fsl,imx6-hdmi-i2c";
 		reg = <0x50>;
 	};
-
 };
 
 
 &i2c3 {
-
 	codec: sgtl5000@0a {
 		compatible = "fsl,sgtl5000";
 		reg = <0x0a>;
@@ -64,18 +97,15 @@
 		VDDIO-supply = <&reg_3p3v>;
 		VDDD-supply = <&reg_1p8v>;
 	};
-
 };
 
 &iomuxc {
-
-// TBD	pinctrl-assert-gpios = <&gpio1 2 GPIO_ACTIVE_HIGH>;
 	
 	hog {
 		pinctrl_hog: hoggrp {
 			fsl,pins = <
-				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x1f059
-				MX6QDL_PAD_EIM_D19__GPIO3_IO19 0x1f059 /* not used pin for ADV7180 driver compatibility */
+				MX6QDL_PAD_EIM_WAIT__GPIO5_IO00 0x1f059 /*WIFI RESET*/
+				MX6QDL_PAD_GPIO_1__GPIO1_IO01  0x1f059 /*CD SD CARD*/
 			>;
 		};
 	};

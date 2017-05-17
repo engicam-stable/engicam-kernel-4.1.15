@@ -345,7 +345,7 @@
 	vbus-supply = <&reg_usb_otg_vbus>;
 	pinctrl-names = "default";
 	disable-over-current;
-	dr_mode="otg";
+	dr_mode = "otg";
 	status = "disabled";
 };
 

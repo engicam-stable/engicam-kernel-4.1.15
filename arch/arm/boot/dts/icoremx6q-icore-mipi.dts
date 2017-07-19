@@ -1,0 +1,167 @@
+/*
+ * Copyright (C) 2013 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/dts-v1/;
+
+#include "imx6q.dtsi"
+#include "imx6qdl-icore.dtsi"
+
+/ {
+	model = "Engicam i.CoreM6 Quad/Dual mipi starterkit";
+	compatible = "fsl,imx6-icore", "fsl,imx6q";
+
+	aliases {
+		mmc0 = &usdhc1;
+		mmc1 = &usdhc3;
+		mmc2 = &usdhc2;
+		mmc3 = &usdhc4;
+	};
+
+	gpio_export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+		GPIO_EIM_DA7 {
+			gpio-export,name = "GPIO_EIM_DA7";
+			gpio-export,input = <1>;
+			gpios = <&gpio3 7 0>;
+		};
+
+		DIPSW1 {
+			gpio-export,name = "DIPSW1";
+			gpio-export,input = <1>;
+			gpios = <&gpio6 0 0>;
+		};
+
+		DIPSW2 {
+			gpio-export,name = "DIPSW2";
+			gpio-export,input = <1>;
+			gpios = <&gpio6 1 0>;
+		};
+
+		DIPSW3 {
+			gpio-export,name = "DIPSW3";
+			gpio-export,input = <1>;
+			gpios = <&gpio6 2 0>;
+		};
+
+		DIPSW4 {
+			gpio-export,name = "DIPSW4";
+			gpio-export,input = <1>;
+			gpios = <&gpio6 3 0>;
+		};				
+	};
+
+	codec: codec {
+		status = "disabled";
+	};
+};
+
+&ldb {
+	ipu_id = <0>; 
+	sec_ipu_id = <0>;
+};
+
+&mipi_csi {
+	status = "okay";
+	ipu_id = <0>;
+	csi_id = <1>;
+	v_channel = <0>;
+	lanes = <2>;
+};
+
+&mxcfb1 {
+	status = "okay";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+&can1 {
+	status = "disabled"; 
+};
+
+&can2 {
+	status = "disabled";
+};
+
+&uart2 {
+	status = "disabled";
+};
+
+&uart3 {
+	status = "disabled";
+};
+
+&uart4 {
+	status = "okay";
+};
+
+&usbotg {
+	status = "disabled";
+};
+
+&usdhc1 {
+	cd-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-assert-gpios = <&gpio1 7 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+&usdhc3 {
+	status = "okay";
+};
+
+&i2c2 {
+
+	hdmi: edid@50 {
+		compatible = "fsl,imx6-hdmi-i2c";
+		reg = <0x50>;
+	};
+};
+
+&i2c3 {
+	ov564x_mipi: ov564x_mipi@3c { /* i2c2 driver */
+		compatible = "ovti,ov564x_mipi";
+		reg = <0x3c>;
+		clocks = <&clks 201>;
+		clock-names = "csi_mclk";
+		DOVDD-supply = <&reg_1p8v>; /* 1.8v */
+		AVDD-supply = <&reg_3p3v>;  /* 3.3v */
+		DVDD-supply = <&reg_3p3v>;  /* 3.3v*/
+		pwn-gpios = <&gpio5 30 1>;   /* active low  */
+		rst-gpios = <&gpio5 31 0>;   /* active high */
+		csi_id = <1>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+	};	
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	hog {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_7__GPIO1_IO07     0x1f059 /* WF111 reset */
+				MX6QDL_PAD_CSI0_DAT12__GPIO5_IO30 0x1f059 /*PWN-GPIOS OV5640*/
+				MX6QDL_PAD_CSI0_DAT13__GPIO5_IO31 0x1f059 /*RST-GPIOS OV5640*/
+				MX6QDL_PAD_EIM_DA7__GPIO3_IO07    0x1f059 /* EIM_DA07 forced to GPIO in */
+				MX6QDL_PAD_GPIO_1__GPIO1_IO01     0x1f059 /*CD SD CARD*/
+				MX6QDL_PAD_CSI0_DAT14__GPIO6_IO00 0x1f059 /*DIPSW1*/
+				MX6QDL_PAD_CSI0_DAT15__GPIO6_IO01 0x1f059 /*DIPSW2*/
+				MX6QDL_PAD_CSI0_DAT16__GPIO6_IO02 0x1f059 /*DIPSW3*/
+				MX6QDL_PAD_CSI0_DAT17__GPIO6_IO03 0x1f059 /*DIPSW4*/
+			>;
+		};
+	};
+};

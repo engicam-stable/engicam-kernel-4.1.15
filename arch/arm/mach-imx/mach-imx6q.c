@@ -204,12 +204,9 @@ static void __init imx6q_enet_phy_init(void)
 
 #define ICORE_GPIO_EDIMM_VER 191 /* GPIO6_31 */
 
-static void __init icore_set_enet_clock(void)
+static void __init set_edimm_version(void)
 {
 	int icore_ver_gpio;
-	struct regmap *gpr;
-	
-	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
 	
 	icore_ver_gpio = ICORE_GPIO_EDIMM_VER;
 	
@@ -222,22 +219,37 @@ static void __init icore_set_enet_clock(void)
 		{
 			edimm_ver = 15;
 			printk("i.Core M6 1.5 version\n");
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
 		}		
 		else
 		{
 			edimm_ver = 10;
 			printk("i.Core M6 standard 1.0 version\n");
-			regmap_update_bits(gpr, IOMUXC_GPR1,
-					IMX6Q_GPR1_ENET_CLK_SEL_MASK,
-					IMX6Q_GPR1_ENET_CLK_SEL_PAD);
 		}
 		gpio_free(icore_ver_gpio);
 	}
 }
 
+static void __init icore_set_enet_clock(void)
+{
+	struct regmap *gpr;
+
+	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
+
+	set_edimm_version();
+
+	if(edimm_ver == 15)
+	{
+		regmap_update_bits(gpr, IOMUXC_GPR1,
+				IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+				IMX6Q_GPR1_ENET_CLK_SEL_ANATOP);
+	}
+	else
+	{
+		regmap_update_bits(gpr, IOMUXC_GPR1,
+				IMX6Q_GPR1_ENET_CLK_SEL_MASK,
+				IMX6Q_GPR1_ENET_CLK_SEL_PAD);
+	}
+}
 
 static void __init imx6q_csi_mux_init(void)
 {
@@ -245,6 +257,8 @@ static void __init imx6q_csi_mux_init(void)
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
 
+	set_edimm_version();
+	printk("[ML]	 imx6q_csi_mux_init %d\n",edimm_ver);
 	if (!IS_ERR(gpr)) {
 		/*
 		 * MX6Q i.Core board:
@@ -263,7 +277,10 @@ static void __init imx6q_csi_mux_init(void)
 			if(cpu_is_imx6q())
 				regmap_update_bits(gpr, IOMUXC_GPR1, 3 << 19, 3 << 19);
 			else
-				regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x24);
+				if(edimm_ver == 15)
+					regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x20);
+				else
+					regmap_update_bits(gpr, IOMUXC_GPR13, 0x3F, 0x24);
 		}
 
 		/*

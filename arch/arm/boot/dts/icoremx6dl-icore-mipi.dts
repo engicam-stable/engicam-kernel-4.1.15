@@ -12,7 +12,7 @@
 #include "imx6qdl-icore.dtsi"
 
 / {
-	model = "Engicam i.CoreM6 DuakKute/Solo mipi starterkit";
+	model = "Engicam i.CoreM6 DualLite/Solo mipi starterkit";
 	compatible = "fsl,imx6-icore", "fsl,imx6dl";
 
 	aliases {

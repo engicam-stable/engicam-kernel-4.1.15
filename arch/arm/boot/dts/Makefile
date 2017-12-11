@@ -378,6 +378,7 @@ dtb-$(CONFIG_SOC_IMX6SX) += \
 	imx6sx-smarcore.dtb
 dtb-$(CONFIG_SOC_IMX6UL) += \
 	geamx6ul-starterkit.dtb \
+	geamx6ul-starterkit-2eth.dtb \
 	geamx6ul-starterkit-emmc.dtb \
 	isiot-imx6ul.dtb \
 	isiot-imx6ul-emmc.dtb \

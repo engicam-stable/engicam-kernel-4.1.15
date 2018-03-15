@@ -281,6 +281,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	icoremx6q-starterkit-rqs.dtb \
 	icoremx6q-icore-mipi.dtb \
 	icoremx6dl-icore-mipi.dtb \
+	icoremx6dl-tianma.dtb \
 	imx6dl-nitrogen6x.dtb \
 	imx6dl-phytec-pbab01.dtb \
 	imx6dl-rex-basic.dtb \

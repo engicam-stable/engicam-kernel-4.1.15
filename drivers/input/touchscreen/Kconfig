@@ -646,6 +646,18 @@ config TOUCHSCREEN_EDT_COVER_FT5X06
 	  To compile this driver as a module, choose M here: the
 	  module will be called edt-ft5x06.
 
+config TOUCHSCREEN_SSD254X
+	tristate "Simple ssd254x touchscreen driver"
+	depends on I2C
+	help
+	  Say Y here if you have an ssd254x touchscreen .
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called ssd254.
+	  
+	  
 config TOUCHSCREEN_MIGOR
 	tristate "Renesas MIGO-R touchscreen"
 	depends on SH_MIGOR && I2C

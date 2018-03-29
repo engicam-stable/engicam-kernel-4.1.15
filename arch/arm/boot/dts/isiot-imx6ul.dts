@@ -79,6 +79,16 @@
 			regulator-always-on;
 		};
 
+		btreg_on: fixedregulator@200 {
+			compatible = "regulator-fixed";
+			regulator-name = "btreg_on";
+			gpio = <&gpio5 9 0>;
+			startup-delay-us = <100>;
+			enable-active-high;
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+
 	};
 
 	sound {
@@ -224,6 +234,7 @@
 &uart5 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
+	vmmc-supply = <&btreg_on>;
         fsl,uart-has-rtscts;
 	status = "okay";
 };

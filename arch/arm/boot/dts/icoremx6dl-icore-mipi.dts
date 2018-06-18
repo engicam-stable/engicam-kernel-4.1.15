@@ -59,6 +59,10 @@
 	codec: codec {
 		status = "disabled";
 	};
+
+	sound: sound {
+		status = "disabled";
+	};
 };
 
 &ldb {
@@ -91,7 +95,7 @@
 };
 
 &uart2 {
-	status = "disabled";
+	status = "okay";
 };
 
 &uart3 {
@@ -103,7 +107,8 @@
 };
 
 &usbotg {
-	status = "disabled";
+	dr_mode = "host";
+	status = "okay";
 };
 
 &usdhc1 {

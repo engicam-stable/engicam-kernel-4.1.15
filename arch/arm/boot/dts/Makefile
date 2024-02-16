@@ -385,6 +385,7 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	isiot-imx6ul.dtb \
 	isiot-imx6ul-emmc.dtb \
 	geamx6ul-ofloco7-cap.dtb \
+	geamx6ul-ofloco7-cap-goodix.dtb \
 	geamx6ul-ofloco7-res.dtb \
 	geamx6ul-ofloco43.dtb \
 	geamx6ul-ofloco7-cap-emmc.dtb \

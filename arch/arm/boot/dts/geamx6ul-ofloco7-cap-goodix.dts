@@ -307,6 +307,17 @@
 		reset-gpios = <&gpio4 18 1>;
 	};
 
+	/* for Goodix911 */
+	polytouch2: gt911@14 {
+		compatible = "goodix,gt911";
+		reg = <0x14>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_goodix>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <0 0>;
+		reset-gpios = <&gpio4 18 1>;
+	};
+
 	pcf8563: rtc@51 {
   		compatible = "pcf8563";
   		reg = <0x51>;
